@@ -1,4 +1,4 @@
-/*
+﻿/*
 
  MIT License
  
@@ -24,9 +24,10 @@
  
 */
 
-#include "../filesystem.h"
 #include <iostream>
 #include <cstdlib>
+
+#include "../filesystem.h"
 
 using std::string;
 using std::cout;

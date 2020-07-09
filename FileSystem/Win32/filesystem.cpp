@@ -24,12 +24,14 @@
  
 */
 
-#include "../filesystem.h"
-#include <windows.h>
-#include <Shlobj.h>
 #include <iostream>
 #include <cstddef>
 #include <cwchar>
+
+#include "../filesystem.h"
+
+#include <windows.h>
+#include <Shlobj.h>
 
 using std::string;
 using std::wstring;

@@ -402,8 +402,8 @@ namespace filesystem {
 
   string environment_expand_variables_ns(string str) {
     if (str.find("${") == string::npos) return str;
-    string pre = str.substr(0, str.find( "${" ));
-    string post = str.substr(str.find( "${" ) + 2);
+    string pre = str.substr(0, str.find("${"));
+    string post = str.substr(str.find("${") + 2);
     if (post.find('}') == string::npos) return str;
     string variable = post.substr(0, post.find('}'));
     post = post.substr(post.find('}') + 1);

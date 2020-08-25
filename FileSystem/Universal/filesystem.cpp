@@ -83,7 +83,8 @@ namespace filesystem {
 
   string fs_get_working_directory() {
     std::error_code ec;
-    return filename_add_slash(fs::current_path(ec).u8string());
+    string result = filename_add_slash(fs::current_path(ec).u8string());
+    return (ec.value() == 0) ? result : "";
   }
 
   bool fs_set_working_directory(string dname) {
@@ -95,7 +96,8 @@ namespace filesystem {
 
   string fs_get_temp_directory() {
     std::error_code ec;
-    return filename_add_slash(fs::temp_directory_path(ec).u8string());
+    string result = filename_add_slash(fs::temp_directory_path(ec).u8string());
+    return (ec.value() == 0) ? result : "";
   }
 
   string fs_get_program_directory() {
@@ -121,8 +123,10 @@ namespace filesystem {
     fname = filesystem::fs_environment_expand_variables(fname);
     const fs::path path = fs::u8path(fname);
     string result = fs::weakly_canonical(path, ec).u8string();
-    if (fs_directory_exists(result)) { return filename_add_slash(result); }
-    return result;
+    if (ec.value() == 0 && directory_exists(result)) {
+      return filename_add_slash(result);
+    }
+    return (ec.value() == 0) ? result : "";
   }
 
   std::uintmax_t fs_file_size(string fname) {

@@ -44,6 +44,8 @@ namespace strings {
 
 } // namespace strings
 
+// provide function stubs for currently unsupported operating systems.
+
 namespace filesystem {
 
   string fs_environment_get_variable(string name) {

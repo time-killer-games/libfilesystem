@@ -32,7 +32,7 @@ namespace strings {
 
   string filename_remove_slash(string dname, bool canonical) {
     if (canonical) dname = filesystem::fs_filename_canonical(dname);
-    if (dname.back() == '/') dname.pop_back();
+    while (dname.back() == '/') dname.pop_back();
     return dname;
   }
 

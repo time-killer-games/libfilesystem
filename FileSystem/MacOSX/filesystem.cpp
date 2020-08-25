@@ -24,8 +24,6 @@
  
 */
 
-#include <iostream>
-
 #include "../filesystem.h"
 
 #include <libproc.h>

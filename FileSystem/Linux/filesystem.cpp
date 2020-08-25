@@ -30,21 +30,14 @@
 #include "../filesystem.h"
 
 using std::string;
-using std::cout;
-using std::endl;
 
 namespace filesystem {
 
-  string get_program_pathname_ns(bool print) {
+  string fs_get_program_pathname() {
     string path;
     char *buffer = realpath("/proc/self/exe", NULL);
     path = buffer ? : "";
     free(buffer);
-    if (!path.empty()) {
-      if (print) {
-        cout << "program_pathname = \"" << path << "\"" << endl;
-      }
-    }
     return path;
   }
 

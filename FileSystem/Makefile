@@ -12,8 +12,5 @@ ifeq ($(UNIX_BASED), true)
 	SOURCES += Universal_System/Extensions/FileSystem/POSIX/filesystem.cpp
 else
 	SOURCES += Universal_System/Extensions/FileSystem/Win32/filesystem.cpp
-	override LDLIBS += -lshell32
 endif
 SOURCES += Universal_System/Extensions/FileSystem/Universal/filesystem.cpp
-override CXXFLAGS += -fexceptions
-override CFLAGS += -fexceptions

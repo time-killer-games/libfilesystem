@@ -34,12 +34,10 @@
 
 using std::string;
 using std::size_t;
-using std::cout;
-using std::endl;
 
 namespace filesystem {
 
-  string get_program_pathname_ns(bool print) {
+  string fs_get_program_pathname() {
     string path;
     size_t length;
     // CTL_KERN::KERN_PROC::KERN_PROC_PATHNAME(-1)
@@ -49,11 +47,6 @@ namespace filesystem {
       char *buffer = path.data();
       if (sysctl(mib, 4, buffer, &length, NULL, 0) == 0) {
         path = string(buffer) + "\0";
-      }
-    }
-    if (!path.empty()) {
-      if (print) {
-        cout << "program_pathname = \"" << path << "\"" << endl;
       }
     }
     return path;

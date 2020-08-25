@@ -35,82 +35,67 @@ namespace strings {
   std::string filename_path(std::string fname);
   std::string filename_name(std::string fname);
   std::string filename_ext(std::string fname);
-  std::string filename_normalize(std::string fname);
-  std::string filename_remove_slash(std::string dname, bool normalize = false);
-  std::string filename_add_slash(std::string dname, bool normalize = false);
+  std::string filename_remove_slash(std::string dname, bool canonical = false);
+  std::string filename_add_slash(std::string dname, bool canonical = false);
 
 } // namespace slashes
 
 namespace filesystem {
 
-  std::string get_working_directory_ns();
-  bool set_working_directory_ns(std::string dname);
-  std::string get_temp_directory_ns();
-  std::string get_program_directory_ns();
-  std::string get_program_filename_ns();
-  std::string get_program_pathname_ns(bool print = true);
-  std::string filename_absolute_ns(std::string fname);
-  bool file_exists_ns(std::string fname);
-  bool file_delete_ns(std::string fname);
-  bool file_rename_ns(std::string oldname, std::string newname);
-  bool file_copy_ns(std::string fname, std::string newname);
-  bool directory_exists_ns(std::string dname);
-  bool directory_create_ns(std::string dname);
-  bool directory_destroy_ns(std::string dname);
-  bool directory_rename_ns(std::string oldname, std::string newname);
-  bool directory_copy_ns(std::string dname, std::string newname);
-  std::string directory_contents_ns(std::string dname, std::string pattern = "*.*", bool includedirs = true);
-  std::string environment_get_variable_ns(std::string name);
-  bool environment_set_variable_ns(std::string name, std::string value);
-  std::string environment_expand_variables_ns(std::string str);
+  std::string fs_get_working_directory();
+  bool fs_set_working_directory(std::string dname);
+  std::string fs_get_temp_directory();
+  std::string fs_get_program_directory();
+  std::string fs_get_program_filename();
+  std::string fs_get_program_pathname();
+  std::string fs_filename_absolute(std::string fname);
+  std::string fs_filename_canonical(std::string fname);
+  bool fs_file_exists(std::string fname);
+  bool fs_file_delete(std::string fname);
+  bool fs_file_rename(std::string oldname, std::string newname);
+  bool fs_file_copy(std::string fname, std::string newname);
+  std::uintmax_t fs_file_size(std::string fname);
+  bool fs_directory_exists(std::string dname);
+  bool fs_directory_create(std::string dname);
+  bool fs_directory_destroy(std::string dname);
+  bool fs_directory_rename(std::string oldname, std::string newname);
+  bool fs_directory_copy(std::string dname, std::string newname);
+  std::uintmax_t fs_directory_size(std::string dname);
+  std::string fs_directory_contents(std::string dname, std::string pattern = "*.*", bool includedirs = true);
+  std::string fs_environment_get_variable(std::string name);
+  bool fs_environment_set_variable(std::string name, std::string value);
+  std::string fs_environment_expand_variables(std::string str);
 
 } // namespace filesystem
 
 namespace enigma_user {
 
   #ifdef OVERRIDE_SANDBOX
-  using ::filesystem::get_working_directory_ns;
-  using ::filesystem::set_working_directory_ns;
-  using ::filesystem::get_temp_directory_ns;
-  using ::filesystem::get_program_directory_ns;
-  using ::filesystem::get_program_filename_ns;
-  using ::filesystem::get_program_pathname_ns;
-  using ::filesystem::filename_absolute_ns;
-  using ::filesystem::file_exists_ns;
-  using ::filesystem::file_delete_ns;
-  using ::filesystem::file_rename_ns;
-  using ::filesystem::file_copy_ns;
-  using ::filesystem::directory_exists_ns;
-  using ::filesystem::directory_create_ns;
-  using ::filesystem::directory_destroy_ns;
-  using ::filesystem::directory_rename_ns;
-  using ::filesystem::directory_copy_ns;
-  using ::filesystem::directory_contents_ns;
-  using ::filesystem::directory_contents_ns;
-  using ::filesystem::environment_get_variable_ns;
-  using ::filesystem::environment_set_variable_ns;
-  using ::filesystem::environment_expand_variables_ns;
-  #define working_directory get_working_directory_ns()
-  #define temp_directory get_temp_directory_ns()
-  #define program_directory get_program_directory_ns()
-  #define program_filename get_program_filename_ns()
-  #define program_pathname get_program_pathname_ns()
-  #define set_working_directory(x) set_working_directory_ns(x)
-  #define filename_absolute(x) filename_absolute_ns(x)
-  #define file_exists(x) file_exists_ns(x)
-  #define file_delete(x) file_delete_ns(x)
-  #define file_rename(x, y) file_rename_ns(x, y)
-  #define file_copy(x, y) file_copy_ns(x, y)
-  #define directory_exists(x) directory_exists_ns(x)
-  #define directory_create(x) directory_create_ns(x)
-  #define directory_destroy(x) directory_destroy_ns(x)
-  #define directory_rename(x, y) directory_rename_ns(x, y)
-  #define directory_copy(x, y) directory_copy_ns(x, y)
-  #define directory_contents(x) directory_contents_ns(x, "*.*", true)
-  #define directory_contents_ext(x, y, z) directory_contents_ns(x, y, z)
-  #define environment_get_variable(x) environment_get_variable_ns(x)
-  #define environment_set_variable(x, y) environment_set_variable_ns(x, y)
-  #define environment_expand_variables(x) environment_expand_variables_ns(x)
+  using namespace filesystem;
+  #define working_directory fs_get_working_directory()
+  #define temp_directory fs_get_temp_directory()
+  #define program_directory fs_get_program_directory()
+  #define program_filename fs_get_program_filename()
+  #define program_pathname fs_get_program_pathname()
+  #define set_working_directory(x) fs_set_working_directory(x)
+  #define filename_absolute(x) fs_filename_absolute(x)
+  #define filename_canonical(x) fs_filename_canonical(x)
+  #define file_exists(x) fs_file_exists(x)
+  #define file_delete(x) fs_file_delete(x)
+  #define file_rename(x, y) fs_file_rename(x, y)
+  #define file_copy(x, y) fs_file_copy(x, y)
+  #define file_size(x) fs_file_size(x)
+  #define directory_exists(x) fs_directory_exists(x)
+  #define directory_create(x) fs_directory_create(x)
+  #define directory_destroy(x) fs_directory_destroy(x)
+  #define directory_rename(x, y) fs_directory_rename(x, y)
+  #define directory_copy(x, y) fs_directory_copy(x, y)
+  #define directory_size(x) fs_directory_size(x)
+  #define directory_contents(x) fs_directory_contents(x, "*.*", true)
+  #define directory_contents_ext(x, y, z) fs_directory_contents(x, y, z)
+  #define environment_get_variable(x) fs_environment_get_variable(x)
+  #define environment_set_variable(x, y) fs_environment_set_variable(x, y)
+  #define environment_expand_variables(x) fs_environment_expand_variables(x)
   #endif
 
 } // namespace enigma_user

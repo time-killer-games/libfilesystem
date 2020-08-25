@@ -36,104 +36,118 @@ using std::string;
 
 EXPORTED_FUNCTION char *get_working_directory() {
   static string result;
-  result = filesystem::get_working_directory_ns();
+  result = filesystem::fs_get_working_directory();
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION double set_working_directory(char *dname) {
-  return filesystem::set_working_directory_ns(dname);
+  return filesystem::fs_set_working_directory(dname);
 }
 
 EXPORTED_FUNCTION char *get_temp_directory() {
   static string result;
-  result = filesystem::get_temp_directory_ns();
+  result = filesystem::fs_get_temp_directory();
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *get_program_directory() {
   static string result;
-  result = filesystem::get_program_directory_ns();
+  result = filesystem::fs_get_program_directory();
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *get_program_filename() {
   static string result;
-  result = filesystem::get_program_filename_ns();
+  result = filesystem::fs_get_program_filename();
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *get_program_pathname() {
   static string result;
-  result = filesystem::get_program_pathname_ns();
+  result = filesystem::fs_get_program_pathname();
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *filename_absolute(char *fname) {
   static string result;
-  result = filesystem::filename_absolute_ns(fname);
+  result = filesystem::fs_filename_absolute(fname);
+  return (char *)result.c_str();
+}
+
+EXPORTED_FUNCTION char *filename_canonical(char *fname) {
+  static string result;
+  result = filesystem::fs_filename_canonical(fname);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION double file_exists(char *fname) {
-  return filesystem::file_exists_ns(fname);
+  return filesystem::fs_file_exists(fname);
 }
 
 EXPORTED_FUNCTION double file_delete(char *fname) {
-  return filesystem::file_delete_ns(fname);
+  return filesystem::fs_file_delete(fname);
 }
 
 EXPORTED_FUNCTION double file_rename(char *oldname, char *newname) {
-  return filesystem::file_rename_ns(oldname, newname);
+  return filesystem::fs_file_rename(oldname, newname);
 }
 
 EXPORTED_FUNCTION double file_copy(char *fname, char *newname) {
-  return filesystem::file_copy_ns(fname, newname);
+  return filesystem::fs_file_copy(fname, newname);
+}
+
+EXPORTED_FUNCTION double file_size(char *fname) {
+  return filesystem::fs_file_size(fname);
 }
 
 EXPORTED_FUNCTION double directory_exists(char *dname) {
-  return filesystem::directory_exists_ns(dname);
+  return filesystem::fs_directory_exists(dname);
 }
 
 EXPORTED_FUNCTION double directory_create(char *dname) {
-  return filesystem::directory_create_ns(dname);
+  return filesystem::fs_directory_create(dname);
 }
 
 EXPORTED_FUNCTION double directory_destroy(char *dname) {
-  return filesystem::directory_destroy_ns(dname);
+  return filesystem::fs_directory_destroy(dname);
 }
 
 EXPORTED_FUNCTION double directory_rename(char *oldname, char *newname) {
-  return filesystem::directory_rename_ns(oldname, newname);
+  return filesystem::fs_directory_rename(oldname, newname);
 }
 
 EXPORTED_FUNCTION double directory_copy(char *dname, char *newname) {
-  return filesystem::directory_copy_ns(dname, newname);
+  return filesystem::fs_directory_copy(dname, newname);
+}
+
+EXPORTED_FUNCTION double directory_size(char *dname) {
+  return filesystem::fs_directory_size(dname);
 }
 
 EXPORTED_FUNCTION char *directory_contents(char *dname) {
   static string result;
-  result = filesystem::directory_contents_ns(dname);
+  result = filesystem::fs_directory_contents(dname);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *directory_contents_ext(char *dname, char *pattern, double includedirs) {
   static string result;
-  result = filesystem::directory_contents_ns(dname, pattern, includedirs);
+  result = filesystem::fs_directory_contents(dname, pattern, includedirs);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *environment_get_variable(char *name) {
   static string result;
-  result = filesystem::environment_get_variable_ns(name);
+  result = filesystem::fs_environment_get_variable(name);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION double environment_set_variable(char *name, char *value) {
-  return filesystem::environment_set_variable_ns(name, value);
+  return filesystem::fs_environment_set_variable(name, value);
 }
 
 EXPORTED_FUNCTION char *environment_expand_variables(char *str) {
   static string result;
-  result = filesystem::environment_expand_variables_ns(str);
+  result = filesystem::fs_environment_expand_variables(str);
   return (char *)result.c_str();
 }

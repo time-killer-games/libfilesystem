@@ -123,7 +123,7 @@ namespace filesystem {
     fname = filesystem::fs_environment_expand_variables(fname);
     const fs::path path = fs::u8path(fname);
     string result = fs::weakly_canonical(path, ec).u8string();
-    if (ec.value() == 0 && directory_exists(result)) {
+    if (ec.value() == 0 && fs_directory_exists(result)) {
       return filename_add_slash(result);
     }
     return (ec.value() == 0) ? result : "";
@@ -256,15 +256,15 @@ namespace filesystem {
         fs::copy(path1, path2, fs::copy_options::recursive, ec);
         result = (ec.value() == 0);
       } else if (path1.u8string() == path3.u8string()) {
-        vector<string> itemVec = split_string(directory_contents(dname, "*.*", true), '\n');
+        vector<string> itemVec = string_split(fs_directory_contents(dname, "*.*", true), '\n');
         if (!fs_directory_exists(newname)) {
           fs_directory_create(newname);
           for (const string &item : itemVec) {
-            if (directory_exists(filename_remove_slash(item)) && 
+            if (fs_directory_exists(filename_remove_slash(item)) && 
               filename_remove_slash(item).substr(retained_length) != retained_string) {
               directory_copy_retained(filename_remove_slash(item), filename_add_slash(path2.u8string()) + 
               filename_name(filename_remove_slash(item)));
-            } else if (file_exists(item)) {
+            } else if (fs_file_exists(item)) {
               fs::copy(item, filename_add_slash(path2.u8string()) + filename_name(item), ec);
               // ignore and skip errored copies and copy what is left.
               // uncomment the line below to break if one copy failed.
@@ -295,10 +295,10 @@ namespace filesystem {
   string fs_directory_contents(string dname, string pattern, bool includedirs) {
     std::error_code ec;
     string result = "";
-    if (!directory_exists(dname)) return "";
+    if (!fs_directory_exists(dname)) return "";
     dname = filename_remove_slash(dname, true);
     const fs::path path = fs::u8path(dname);
-    if (directory_exists(dname)) {
+    if (fs_directory_exists(dname)) {
       fs::directory_iterator end_itr;
       for (fs::directory_iterator dir_ite(path, ec); dir_ite != end_itr; dir_ite++) {
         if (ec.value() != 0) { break; }
@@ -314,12 +314,12 @@ namespace filesystem {
     if (result.back() == '\n') result.pop_back();
     pattern = string_replace_all(pattern, " ", "");
     pattern = string_replace_all(pattern, "*", "");
-    vector<string> itemVec = split_string(result, '\n');
-    vector<string> extVec = split_string(pattern, ';');
+    vector<string> itemVec = string_split(result, '\n');
+    vector<string> extVec = string_split(pattern, ';');
     std::set<string> filteredItems;
     for (const string &item : itemVec) {
       for (const string &ext : extVec) {
-        if (ext == "." || ext == filename_ext(item) || directory_exists(item)) {
+        if (ext == "." || ext == filename_ext(item) || fs_directory_exists(item)) {
           filteredItems.insert(item);
           break;
         }

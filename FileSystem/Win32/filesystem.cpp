@@ -56,12 +56,12 @@ namespace strings {
 
   string filename_remove_slash(string dname, bool canonical) {
     if (canonical) dname = filesystem::fs_filename_canonical(dname);
-    if (dname.back() == '\\') dname.pop_back();
+    while (dname.back() == '\\' || dname.back() == '/') dname.pop_back();
     return dname;
   }
 
   string filename_add_slash(string dname, bool canonical) {
-    if (canonical) dname = filesystem::fs_filename_canonical(dname);
+    dname = filename_remove_slash(dname, canonical);
     if (dname.back() != '\\') dname += "\\";
     return dname;
   }

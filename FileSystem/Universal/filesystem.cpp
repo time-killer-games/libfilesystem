@@ -179,7 +179,7 @@ namespace filesystem {
     if (fs::exists(path)) {
       fs::directory_iterator end_itr;
       for (fs::directory_iterator dir_ite(path); dir_ite != end_itr; dir_ite++) {
-        fs::path file_path(fs_filename_absolute(dir_ite->path().u8string()));
+        fs::path file_path = fs::u8path(fs_filename_absolute(dir_ite->path().u8string()));
         if (!fs::is_directory(dir_ite->status())) {
           result += fs_file_size(file_path.u8string());
         } else {
@@ -301,7 +301,7 @@ namespace filesystem {
       fs::directory_iterator end_itr;
       for (fs::directory_iterator dir_ite(path, ec); dir_ite != end_itr; dir_ite++) {
         if (ec.value() != 0) { break; }
-        fs::path file_path(fs_filename_absolute(dir_ite->path().u8string()));
+        fs::path file_path = fs::u8path(fs_filename_absolute(dir_ite->path().u8string()));
         if (!fs::is_directory(dir_ite->status(ec)) && ec.value() == 0) {
           result += file_path.u8string() + "\n";
         } else if (ec.value() == 0 && includedirs) {

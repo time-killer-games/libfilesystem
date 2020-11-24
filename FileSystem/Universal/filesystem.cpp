@@ -192,7 +192,8 @@ namespace filesystem {
 
   bool fs_directory_exists(string dname) {
     std::error_code ec;
-    dname = filename_remove_slash(dname, true);
+    dname = filename_remove_slash(dname, false);
+    dname = fs_environment_expand_variables(dname);
     const fs::path path = fs::u8path(dname);
     return (fs::exists(path, ec) && ec.value() == 0 && 
       fs::is_directory(path, ec) && ec.value() == 0);

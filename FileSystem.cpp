@@ -27,12 +27,16 @@
 #include "FileSystem/filesystem.h"
 
 using std::string;
+using std::vector;
 
 #ifdef _WIN32
 #define EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 #else /* macOS, Linux, and BSD */
 #define EXPORTED_FUNCTION extern "C" __attribute__((visibility("default")))
 #endif
+
+static vector<string> directory_contents;
+static int directory_contents_index = 0;
 
 EXPORTED_FUNCTION char *get_working_directory() {
   static string result;
@@ -124,16 +128,25 @@ EXPORTED_FUNCTION double directory_size(char *dname) {
   return filesystem::fs_directory_size(dname);
 }
 
-EXPORTED_FUNCTION char *directory_contents(char *dname) {
-  static string result;
-  result = filesystem::fs_directory_contents(dname);
-  return (char *)result.c_str();
+EXPORTED_FUNCTION double directory_contents_close() {
+  directory_contents.clear(); 
+  directory_contents_index = 0;
+  return 0;
 }
 
-EXPORTED_FUNCTION char *directory_contents_ext(char *dname, char *pattern, double includedirs) {
-  static string result;
-  result = filesystem::fs_directory_contents(dname, pattern, includedirs);
-  return (char *)result.c_str();
+EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, double includedirs) {
+  directory_contents_close();
+  directory_contents = filesystem::fs_directory_contents(dname, pattern, includedirs);
+  if (directory_contents_index < directory_contents.size())
+  return (char *)directory_contents[directory_contents_index].c_str();
+  else return (char *)"";
+}
+
+EXPORTED_FUNCTION char *directory_contents_next() {
+  directory_contents_index++;
+  if (directory_contents_index < directory_contents.size())
+  return (char *)directory_contents[directory_contents_index].c_str();
+  else return (char *)"";
 }
 
 EXPORTED_FUNCTION char *environment_get_variable(char *name) {
@@ -150,4 +163,52 @@ EXPORTED_FUNCTION char *environment_expand_variables(char *str) {
   static string result;
   result = filesystem::fs_environment_expand_variables(str);
   return (char *)result.c_str();
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_year(char *fname) {
+  return filesystem::fs_file_get_date_accessed_year(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_month(char *fname) {
+  return filesystem::fs_file_get_date_accessed_month(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_day(char *fname) {
+  return filesystem::fs_file_get_date_accessed_day(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_hour(char *fname) {
+  return filesystem::fs_file_get_date_accessed_hour(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_minute(char *fname) {
+  return filesystem::fs_file_get_date_accessed_minute(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_accessed_second(char *fname) {
+  return filesystem::fs_file_get_date_accessed_second(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_year(char *fname) {
+  return filesystem::fs_file_get_date_modified_year(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_month(char *fname) {
+  return filesystem::fs_file_get_date_modified_month(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_day(char *fname) {
+  return filesystem::fs_file_get_date_modified_day(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_hour(char *fname) {
+  return filesystem::fs_file_get_date_modified_hour(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_minute(char *fname) {
+  return filesystem::fs_file_get_date_modified_minute(fname);
+}
+
+EXPORTED_FUNCTION double file_get_date_modified_second(char *fname) {
+  return filesystem::fs_file_get_date_modified_second(fname);
 }

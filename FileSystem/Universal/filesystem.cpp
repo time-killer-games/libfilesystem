@@ -33,6 +33,7 @@
 namespace fs = std::filesystem;
 
 using namespace strings;
+using namespace datetime;
 
 using std::string;
 using std::vector;
@@ -263,7 +264,7 @@ namespace filesystem {
         fs::copy(path1, path2, fs::copy_options::recursive, ec);
         result = (ec.value() == 0);
       } else if (path1.u8string() == path3.u8string()) {
-        vector<string> itemVec = string_split(fs_directory_contents(dname, "*.*", true), '\n');
+        vector<string> itemVec = fs_directory_contents(dname, "*.*", true);
         if (!fs_directory_exists(newname)) {
           fs_directory_create(newname);
           for (const string &item : itemVec) {
@@ -299,10 +300,9 @@ namespace filesystem {
     return directory_copy_retained(dname, newname);
   }
 
-  string fs_directory_contents(string dname, string pattern, bool includedirs) {
-    std::error_code ec;
-    string result = "";
-    if (!fs_directory_exists(dname)) return "";
+  vector<string> fs_directory_contents(string dname, string pattern, bool includedirs) {
+    std::error_code ec; vector<string> result_unfiltered;
+    if (!fs_directory_exists(dname)) return result_unfiltered;
     dname = filename_remove_slash(dname, true);
     const fs::path path = fs::u8path(dname);
     if (fs_directory_exists(dname)) {
@@ -311,20 +311,18 @@ namespace filesystem {
         if (ec.value() != 0) { break; }
         fs::path file_path = fs::u8path(fs_filename_absolute(dir_ite->path().u8string()));
         if (!fs::is_directory(dir_ite->status(ec)) && ec.value() == 0) {
-          result += file_path.u8string() + "\n";
+          result_unfiltered.push_back(file_path.u8string());
         } else if (ec.value() == 0 && includedirs) {
-          result += filename_add_slash(file_path.u8string()) + "\n";
+          result_unfiltered.push_back(filename_add_slash(file_path.u8string()));
         }
       }
     }
     if (pattern.empty()) pattern = "*.*";
-    if (result.back() == '\n') result.pop_back();
     pattern = string_replace_all(pattern, " ", "");
     pattern = string_replace_all(pattern, "*", "");
-    vector<string> itemVec = string_split(result, '\n');
     vector<string> extVec = string_split(pattern, ';');
     std::set<string> filteredItems;
-    for (const string &item : itemVec) {
+    for (const string &item : result_unfiltered) {
       for (const string &ext : extVec) {
         if (ext == "." || ext == filename_ext(item) || fs_directory_exists(item)) {
           filteredItems.insert(item);
@@ -332,13 +330,12 @@ namespace filesystem {
         }
       }
     }
-    result = "";
-    if (filteredItems.empty()) return result;
+    vector<string> result_filtered;
+    if (filteredItems.empty()) return result_filtered;
     for (const string &filteredName : filteredItems) {
-      result += filteredName + "\n";
+      result_filtered.push_back(filteredName);
     }
-    result.pop_back();
-    return result;
+    return result_filtered;
   }
 
   string fs_environment_expand_variables(string str) {
@@ -350,6 +347,66 @@ namespace filesystem {
     post = post.substr(post.find('}') + 1);
     string value = fs_environment_get_variable(variable);
     return fs_environment_expand_variables(pre + value + post);
+  }
+
+  int fs_file_get_date_accessed_year(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_year);
+  }
+
+  int fs_file_get_date_accessed_month(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_month);
+  }
+
+  int fs_file_get_date_accessed_day(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_day);
+  }
+
+  int fs_file_get_date_accessed_hour(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_hour);
+  }
+
+  int fs_file_get_date_accessed_minute(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_minute);
+  }
+
+  int fs_file_get_date_accessed_second(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), false, dt_second);
+  }
+
+  int fs_file_get_date_modified_year(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_year);
+  }
+
+  int fs_file_get_date_modified_month(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_month);
+  }
+
+  int fs_file_get_date_modified_day(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_day);
+  }
+
+  int fs_file_get_date_modified_hour(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_hour);
+  }
+
+  int fs_file_get_date_modified_minute(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_minute);
+  }
+
+  int fs_file_get_date_modified_second(string fname) {
+    fname = fs_environment_expand_variables(fname);
+    return file_get_date_accessed_modified(fname.c_str(), true, dt_second);
   }
 
 } // namespace filesystem

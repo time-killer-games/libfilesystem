@@ -52,6 +52,26 @@ namespace {
 
 } // anonymous namespace
 
+namespace datetime {
+
+  int file_get_date_accessed_modified(const char *fname, bool modified, int type) {
+    int result = -1; // returns -1 on failure
+    std::wstring wfname = widen(fname);
+    struct _stat info = { 0 }; result = _wstat(wfname.c_str(), &info);
+    time_t time = modified ? info.st_mtime : info.st_atime;
+    if (result == -1) return result; // failure: stat errored
+    struct tm *timeinfo = std::localtime(&time);
+    if      (type == dt_year)   return timeinfo->tm_year + 1900;
+    else if (type == dt_month)  return timeinfo->tm_mon  + 1;
+    else if (type == dt_day)    return timeinfo->tm_mday;
+    else if (type == dt_hour)   return timeinfo->tm_hour;
+    else if (type == dt_minute) return timeinfo->tm_min;
+    else if (type == dt_second) return timeinfo->tm_sec;
+    else return result; // failure: enum value not found
+  }
+
+} // namespace datetime
+
 namespace strings {
 
   string filename_remove_slash(string dname, bool canonical) {

@@ -26,7 +26,27 @@
 
 #include <string>
 #include <vector>
+
+#include <ctime>
 #include <cstddef>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+namespace datetime {
+
+  enum dt_type {
+    dt_year, 
+    dt_month, 
+    dt_day, 
+    dt_hour, 
+    dt_minute, 
+    dt_second
+  };
+
+  int file_get_date_accessed_modified(const char *fname, bool modified, int type);
+
+}
 
 namespace strings {
 
@@ -61,10 +81,22 @@ namespace filesystem {
   bool fs_directory_rename(std::string oldname, std::string newname);
   bool fs_directory_copy(std::string dname, std::string newname);
   std::uintmax_t fs_directory_size(std::string dname);
-  std::string fs_directory_contents(std::string dname, std::string pattern = "*.*", bool includedirs = true);
+  std::vector<std::string> fs_directory_contents(std::string dname, std::string pattern = "*.*", bool includedirs = true);
   std::string fs_environment_get_variable(std::string name);
   bool fs_environment_set_variable(std::string name, std::string value);
   std::string fs_environment_expand_variables(std::string str);
+  int fs_file_get_date_accessed_year(std::string fname);
+  int fs_file_get_date_accessed_month(std::string fname);
+  int fs_file_get_date_accessed_day(std::string fname);
+  int fs_file_get_date_accessed_hour(std::string fname);
+  int fs_file_get_date_accessed_minute(std::string fname);
+  int fs_file_get_date_accessed_second(std::string fname);
+  int fs_file_get_date_modified_year(std::string fname);
+  int fs_file_get_date_modified_month(std::string fname);
+  int fs_file_get_date_modified_day(std::string fname);
+  int fs_file_get_date_modified_hour(std::string fname);
+  int fs_file_get_date_modified_minute(std::string fname);
+  int fs_file_get_date_modified_second(std::string fname);
 
 } // namespace filesystem
 
@@ -96,6 +128,18 @@ namespace enigma_user {
   #define environment_get_variable(x) fs_environment_get_variable(x)
   #define environment_set_variable(x, y) fs_environment_set_variable(x, y)
   #define environment_expand_variables(x) fs_environment_expand_variables(x)
+  #define file_get_date_accessed_year(x) fs_file_get_date_accessed_year(x)
+  #define file_get_date_accessed_month(x) fs_file_get_date_accessed_month(x)
+  #define file_get_date_accessed_day(x) fs_file_get_date_accessed_day(x)
+  #define file_get_date_accessed_hour(x) fs_file_get_date_accessed_hour(x)
+  #define file_get_date_accessed_minute(x) fs_file_get_date_accessed_minute(x)
+  #define file_get_date_accessed_second(x) fs_file_get_date_accessed_second(x)
+  #define file_get_date_modified_year(x) fs_file_get_date_modified_year(x)
+  #define file_get_date_modified_month(x) fs_file_get_date_modified_month(x)
+  #define file_get_date_modified_day(x) fs_file_get_date_modified_day(x)
+  #define file_get_date_modified_hour(x) fs_file_get_date_modified_hour(x)
+  #define file_get_date_modified_minute(x) fs_file_get_date_modified_minute(x)
+  #define file_get_date_modified_second(x) fs_file_get_date_modified_second(x)
   #endif
 
 } // namespace enigma_user

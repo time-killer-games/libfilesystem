@@ -360,6 +360,8 @@ namespace filesystem {
         result_filtered.push_back(result_unfiltered[i]);
       }
     }
+    std::set<string> removed_duplicates(result_filtered.begin(), result_filtered.end());
+    result_filtered.clear(); result_filtered.assign(removed_duplicates.begin(), removed_duplicates.end());
     return result_filtered;
   }
 

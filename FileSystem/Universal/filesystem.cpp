@@ -25,6 +25,7 @@
 */
 
 #include <filesystem>
+#include <algorithm>
 #include <sstream>
 #include <set>
 
@@ -334,6 +335,30 @@ namespace filesystem {
     if (filteredItems.empty()) return result_filtered;
     for (const string &filteredName : filteredItems) {
       result_filtered.push_back(filteredName);
+    }
+    return result_filtered;
+  }
+
+  static inline vector<string> fs_directory_contents_recursive_helper(string dname, string pattern) {
+    vector<string> result = fs_directory_contents(dname, pattern, true);
+    for (int i = 0; i < result.size(); i++) {
+      if (fs_directory_exists(result[i])) {
+        vector<string> recursive_result = fs_directory_contents_recursive_helper(result[i], pattern);
+        if (recursive_result.size() > 0) {
+          result.insert(result.end(), recursive_result.begin(), recursive_result.end());
+        }
+      }
+    }
+    return result;
+  }
+
+  vector<string> fs_directory_contents_recursive(string dname, string pattern, bool includedirs) {
+    vector<string> result_unfiltered = fs_directory_contents_recursive_helper(dname, pattern);
+    if (includedirs) return result_unfiltered; vector<string> result_filtered;
+    for (int i = 0; i < result_unfiltered.size(); i++) {
+      if (!fs_directory_exists(result_unfiltered[i])) {
+        result_filtered.push_back(result_unfiltered[i]);
+      }
     }
     return result_filtered;
   }

@@ -134,9 +134,10 @@ EXPORTED_FUNCTION double directory_contents_close() {
   return 0;
 }
 
-EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, double includedirs) {
+EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, double includedirs, double recursive) {
   directory_contents_close();
-  directory_contents = filesystem::fs_directory_contents(dname, pattern, includedirs);
+  if (!recursive) directory_contents = filesystem::fs_directory_contents(dname, pattern, includedirs);
+  else directory_contents = filesystem::fs_directory_contents_recursive(dname, pattern, includedirs);
   if (directory_contents_index < directory_contents.size())
   return (char *)directory_contents[directory_contents_index].c_str();
   else return (char *)"";

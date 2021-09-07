@@ -82,6 +82,7 @@ namespace filesystem {
   bool fs_directory_copy(std::string dname, std::string newname);
   std::uintmax_t fs_directory_size(std::string dname);
   std::vector<std::string> fs_directory_contents(std::string dname, std::string pattern = "*.*", bool includedirs = true);
+  std::vector<std::string> fs_directory_contents_recursive(std::string dname, std::string pattern = "*.*", bool includedirs = true);
   std::string fs_environment_get_variable(std::string name);
   bool fs_environment_set_variable(std::string name, std::string value);
   std::string fs_environment_expand_variables(std::string str);
@@ -125,6 +126,8 @@ namespace enigma_user {
   #define directory_size(x) fs_directory_size(x)
   #define directory_contents(x) fs_directory_contents(x, "*.*", true)
   #define directory_contents_ext(x, y, z) fs_directory_contents(x, y, z)
+  #define directory_contents_recursive(x) fs_directory_contents_recursive(x, "*.*", true)
+  #define directory_contents_recursive_ext(x, y, z) fs_directory_contents_recursive(x, y, z)
   #define environment_get_variable(x) fs_environment_get_variable(x)
   #define environment_set_variable(x, y) fs_environment_set_variable(x, y)
   #define environment_expand_variables(x) fs_environment_expand_variables(x)

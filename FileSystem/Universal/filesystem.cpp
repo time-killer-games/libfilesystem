@@ -31,6 +31,10 @@
 
 #include "../filesystem.h"
 
+#if defined(_WIN32) 
+#include <windows.h>
+#endif
+
 namespace fs = std::filesystem;
 
 using namespace strings;
@@ -40,11 +44,25 @@ using std::string;
 using std::vector;
 using std::size_t;
 
+namespace {
+
+void MessagePump() {
+  #if defined(_WIN32) 
+  MSG msg; while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+  #endif
+}
+
+} // anonymous namespace
+
 namespace strings {
 
   string string_replace_all(string str, string substr, string nstr) {
     size_t pos = 0;
     while ((pos = str.find(substr, pos)) != string::npos) {
+      MessagePump();
       str.replace(pos, substr.length(), nstr);
       pos += nstr.length();
     }
@@ -55,8 +73,10 @@ namespace strings {
     vector<string> vec;
     std::stringstream sstr(str);
     string tmp;
-    while (std::getline(sstr, tmp, delimiter))
+    while (std::getline(sstr, tmp, delimiter)) {
+      MessagePump();
       vec.push_back(tmp);
+    }
     return vec;
   }
 
@@ -188,6 +208,7 @@ namespace filesystem {
     if (fs::exists(path)) {
       fs::directory_iterator end_itr;
       for (fs::directory_iterator dir_ite(path); dir_ite != end_itr; dir_ite++) {
+        MessagePump();
         fs::path file_path = fs::u8path(fs_filename_absolute(dir_ite->path().u8string()));
         if (!fs::is_directory(dir_ite->status())) {
           result += fs_file_size(file_path.u8string());
@@ -269,6 +290,7 @@ namespace filesystem {
         if (!fs_directory_exists(newname)) {
           fs_directory_create(newname);
           for (const string &item : itemVec) {
+            MessagePump();
             if (fs_directory_exists(filename_remove_slash(item)) && 
               filename_remove_slash(item).substr(retained_length) != retained_string) {
               directory_copy_retained(filename_remove_slash(item), filename_add_slash(path2.u8string()) + 
@@ -309,6 +331,7 @@ namespace filesystem {
     if (fs_directory_exists(dname)) {
       fs::directory_iterator end_itr;
       for (fs::directory_iterator dir_ite(path, ec); dir_ite != end_itr; dir_ite++) {
+        MessagePump();
         if (ec.value() != 0) { break; }
         fs::path file_path = fs::u8path(fs_filename_absolute(dir_ite->path().u8string()));
         if (!fs::is_directory(dir_ite->status(ec)) && ec.value() == 0) {
@@ -324,7 +347,9 @@ namespace filesystem {
     vector<string> extVec = string_split(pattern, ';');
     std::set<string> filteredItems;
     for (const string &item : result_unfiltered) {
+      MessagePump();
       for (const string &ext : extVec) {
+        MessagePump();
         if (ext == "." || ext == filename_ext(item) || fs_directory_exists(item)) {
           filteredItems.insert(item);
           break;
@@ -334,6 +359,7 @@ namespace filesystem {
     vector<string> result_filtered;
     if (filteredItems.empty()) return result_filtered;
     for (const string &filteredName : filteredItems) {
+      MessagePump();
       result_filtered.push_back(filteredName);
     }
     return result_filtered;
@@ -342,6 +368,7 @@ namespace filesystem {
   static inline vector<string> fs_directory_contents_recursive_helper(string dname, string pattern) {
     vector<string> result = fs_directory_contents(dname, pattern, true);
     for (int i = 0; i < result.size(); i++) {
+      MessagePump();
       if (fs_directory_exists(result[i])) {
         vector<string> recursive_result = fs_directory_contents_recursive_helper(result[i], pattern);
         if (recursive_result.size() > 0) {
@@ -354,9 +381,12 @@ namespace filesystem {
 
   vector<string> fs_directory_contents_recursive(string dname, string pattern, bool includedirs) {
     vector<string> result_unfiltered = fs_directory_contents_recursive_helper(dname, pattern);
-    if (includedirs) return result_unfiltered; vector<string> result_filtered;
+    vector<string> result_filtered;
     for (int i = 0; i < result_unfiltered.size(); i++) {
+      MessagePump();
       if (!fs_directory_exists(result_unfiltered[i])) {
+        result_filtered.push_back(result_unfiltered[i]);
+      } else if (includedirs) {
         result_filtered.push_back(result_unfiltered[i]);
       }
     }

@@ -1,7 +1,7 @@
 #!/bin/sh
 cd "${0%/*}";
 if [ $(uname) = "Darwin" ]; then
-  clang++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.dylib" -shared -std=c++17; 
+  clang++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.dylib" -shared -std=c++17 -arch arm64 -arch x86_64; 
 elif [ $(uname) = "Linux" ]; then
   g++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.so" -shared -std=c++17 -static-libgcc -static-libstdc++;
 elif [ $(uname) = "FreeBSD" ]; then

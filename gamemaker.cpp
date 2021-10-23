@@ -262,18 +262,15 @@ EXPORTED_FUNCTION double file_text_open_append(char *fname) {
 }
 
 EXPORTED_FUNCTION double file_text_write_real(double fd, double val) {
-  ngs::fs::file_text_write_real(fd, val);
-  return 0;
+  return ngs::fs::file_text_write_real(fd, val);
 }
   
 EXPORTED_FUNCTION double file_text_write_string(double fd, char *str) {
-  ngs::fs::file_text_write_string(fd, str);
-  return 0;
+  return ngs::fs::file_text_write_string(fd, str);
 }
 
 EXPORTED_FUNCTION double file_text_writeln(double fd) {
-  ngs::fs::file_text_writeln(fd);
-  return 0;
+  return ngs::fs::file_text_writeln(fd);
 }
 
 EXPORTED_FUNCTION double file_text_eoln(double fd) {

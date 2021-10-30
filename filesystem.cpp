@@ -647,6 +647,16 @@ namespace ngs::fs {
     #endif
     return -1;
   }
+
+  int file_bin_rewrite(int fd) {
+    #if defined(_WIN32)
+    _lseek(fd, 0, SEEK_SET);
+    return _chsize(fd, 0);
+    #else
+    lseek(fd, 0, SEEK_SET);
+    return ftruncate(fd, 0);
+    #endif
+  }
   
   int file_bin_close(int fd) {
     return close(fd);
@@ -679,15 +689,6 @@ namespace ngs::fs {
     return _lseek(fd, pos, SEEK_CUR);
     #else
     return lseek(fd, pos, SEEK_CUR);
-    #endif
-  }
-
-  int file_bin_rewrite(int fd) {
-    file_bin_seek(fd, -file_bin_size(fd));
-    #if defined(_WIN32)
-    return _chsize(fd, 0);
-    #else
-    return ftruncate(fd, 0);
     #endif
   }
 

@@ -683,7 +683,7 @@ namespace ngs::fs {
   }
 
   int file_bin_rewrite(int fd) {
-    file_bin_seek(fd, 0);
+    file_bin_seek(fd, -file_bin_size(fd));
     #if defined(_WIN32)
     return _chsize(fd, 0);
     #else

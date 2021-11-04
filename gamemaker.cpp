@@ -101,7 +101,7 @@ EXPORTED_FUNCTION double file_copy(char *fname, char *newname) {
 }
 
 EXPORTED_FUNCTION double file_size(char *fname) {
-  return ngs::fs::file_size(fname);
+  return (double)ngs::fs::file_size(fname);
 }
 
 EXPORTED_FUNCTION double directory_exists(char *dname) {
@@ -125,7 +125,7 @@ EXPORTED_FUNCTION double directory_copy(char *dname, char *newname) {
 }
 
 EXPORTED_FUNCTION double directory_size(char *dname) {
-  return ngs::fs::directory_size(dname);
+  return (double)ngs::fs::directory_size(dname);
 }
 
 EXPORTED_FUNCTION double directory_contents_close() {
@@ -219,35 +219,35 @@ EXPORTED_FUNCTION double file_get_date_modified_second(char *fname) {
 }
 
 EXPORTED_FUNCTION double file_bin_open(char *fname, double mode) {
-  return ngs::fs::file_bin_open(fname, mode);
+  return ngs::fs::file_bin_open(fname, (int)mode);
 }
 
 EXPORTED_FUNCTION double file_bin_rewrite(double fd) {
-  return ngs::fs::file_bin_rewrite(fd);
+  return ngs::fs::file_bin_rewrite((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_close(double fd) {
-  return ngs::fs::file_bin_close(fd);
+  return ngs::fs::file_bin_close((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_size(double fd) {
-  return ngs::fs::file_bin_size(fd);
+  return ngs::fs::file_bin_size((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_position(double fd) {
-  return ngs::fs::file_bin_position(fd);
+  return ngs::fs::file_bin_position((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_seek(double fd, double pos) {
-  return ngs::fs::file_bin_seek(fd, pos);
+  return ngs::fs::file_bin_seek((int)fd, (long)pos);
 }
 
 EXPORTED_FUNCTION double file_bin_read_byte(double fd) {
-  return ngs::fs::file_bin_read_byte(fd);
+  return ngs::fs::file_bin_read_byte((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_write_byte(double fd, double byte) {
-  return ngs::fs::file_bin_write_byte(fd, byte);
+  return ngs::fs::file_bin_write_byte((int)fd, (int)byte);
 }
 
 EXPORTED_FUNCTION double file_text_open_read(char *fname) {
@@ -263,44 +263,44 @@ EXPORTED_FUNCTION double file_text_open_append(char *fname) {
 }
 
 EXPORTED_FUNCTION double file_text_write_real(double fd, double val) {
-  return ngs::fs::file_text_write_real(fd, val);
+  return ngs::fs::file_text_write_real((int)fd, val);
 }
   
 EXPORTED_FUNCTION double file_text_write_string(double fd, char *str) {
-  return ngs::fs::file_text_write_string(fd, str);
+  return ngs::fs::file_text_write_string((int)fd, str);
 }
 
 EXPORTED_FUNCTION double file_text_writeln(double fd) {
-  return ngs::fs::file_text_writeln(fd);
+  return ngs::fs::file_text_writeln((int)fd);
 }
 
 EXPORTED_FUNCTION double file_text_eoln(double fd) {
-  return ngs::fs::file_text_eoln(fd);
+  return ngs::fs::file_text_eoln((int)fd);
 }
 
 EXPORTED_FUNCTION double file_text_eof(double fd) {
-  return ngs::fs::file_text_eof(fd);
+  return ngs::fs::file_text_eof((int)fd);
 }
 
 EXPORTED_FUNCTION double file_text_read_real(double fd) {
-  return ngs::fs::file_text_read_real(fd);
+  return ngs::fs::file_text_read_real((int)fd);
 }
 
 EXPORTED_FUNCTION char *file_text_read_string(double fd) {
   static string result;
-  result = ngs::fs::file_text_read_string(fd);
+  result = ngs::fs::file_text_read_string((int)fd);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *file_text_readln(double fd) {
   static string result;
-  result = ngs::fs::file_text_readln(fd);
+  result = ngs::fs::file_text_readln((int)fd);
   return (char *)result.c_str();
 }
 
 EXPORTED_FUNCTION char *file_text_read_all(double fd) {
   static string result;
-  result = ngs::fs::file_text_read_all(fd);
+  result = ngs::fs::file_text_read_all((int)fd);
   return (char *)result.c_str();
 }
   
@@ -309,5 +309,5 @@ EXPORTED_FUNCTION double file_text_open_from_string(char *str) {
 }
 
 EXPORTED_FUNCTION double file_text_close(double fd) {
-  return ngs::fs::file_text_close(fd);
+  return ngs::fs::file_text_close((int)fd);
 }

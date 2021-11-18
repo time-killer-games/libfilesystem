@@ -870,7 +870,7 @@ namespace ngs::fs {
   int file_text_open_from_string(string str) {
     int fd[2];
     #if defined(_WIN32)
-    if (_pipe(fd, str.length(), O_BINARY) == -1) return -1;
+    if (_pipe(fd, str.length() + 1, O_BINARY) == -1) return -1;
     #else
     if (pipe(fd) < 0) return -1;
     #endif

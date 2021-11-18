@@ -36,7 +36,7 @@ using std::vector;
 #endif
 
 static vector<string> directory_contents;
-static int directory_contents_index = 0;
+static unsigned directory_contents_index = 0;
 
 EXPORTED_FUNCTION char *get_working_directory() {
   static string result;

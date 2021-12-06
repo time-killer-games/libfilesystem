@@ -91,7 +91,7 @@ namespace ngs::fs {
     }
 
     int file_get_date_accessed_modified(const char *fname, bool modified, int type) {
-      int result = -1; // returns -1 on failure
+      int result = -1;
       #if defined(_WIN32)
       std::wstring wfname = widen(fname);
       struct _stat info = { 0 }; 
@@ -101,7 +101,7 @@ namespace ngs::fs {
       result = stat(fname, &info);
       #endif
       time_t time = modified ? info.st_mtime : info.st_atime;
-      if (result == -1) return result; // failure: stat errored
+      if (result == -1) return result;
       #if defined(_WIN32)
       struct tm timeinfo = { 0 };
       if (localtime_s(&timeinfo, &time)) return -1;
@@ -714,13 +714,13 @@ namespace ngs::fs {
   }
 
   int file_bin_read_byte(int fd) {
-    int byte = -1;
+    int byte = 0;
     #if defined(_WIN32)
     int num = (int)_read(fd, &byte, 1);
     #else
     int num = (int)read(fd, &byte, 1);
     #endif
-    if (num == -1) return -1;
+    if (num == -1) return 0;
     return byte;
   }
 
@@ -746,17 +746,10 @@ namespace ngs::fs {
 
   long file_text_write_string(int fd, string str) {
     #if defined(_WIN32)
-    wstring wstr = widen(str);
-    wchar_t *buffer = new wchar_t[wstr.length()];
-    wcscpy_s(buffer, wstr.length(), wstr.c_str());
-    str = narrow(buffer);
     long result = _write(fd, str.data(), str.length());
     #else
-    char *buffer = new char[str.length()];
-    strcpy(buffer, str.c_str());
-    long result = write(fd, buffer, str.length());
+    long result = write(fd, str.data(), str.length());
     #endif
-    delete[] buffer;
     return result;
   }
 
@@ -769,20 +762,26 @@ namespace ngs::fs {
     return file_bin_write_byte(fd, '\n');
   }
 
+  static unsigned cnt = 0;
   bool file_text_eof(int fd) {
-    return (file_bin_position(fd) >= file_bin_size(fd));
+    bool res1 = ((char)file_bin_read_byte(fd) == '\0');
+    bool res2 = (file_bin_position(fd) > file_bin_size(fd));
+    while (res2 && cnt < 2) { file_bin_seek(fd, -1); cnt++; }
+    if (!res2) file_bin_seek(fd, -1);
+    cnt = 0; return (res1 || res2);
   }
 
   bool file_text_eoln(int fd) {
+    bool res1 = ((char)file_bin_read_byte(fd) == '\n');
+    bool res2 = file_text_eof(fd);
     file_bin_seek(fd, -1);
-    bool res = ((char)file_bin_read_byte(fd) == '\n');
-    return (file_text_eof(fd) || res);
+    return (res1 || res2);
   }
 
   double file_text_read_real(int fd) {
     bool dot = false, sign = false;
     string str; char byte = (char)file_bin_read_byte(fd);
-    if (byte == '\n') byte = (char)file_bin_read_byte(fd);
+    while (byte == '\r' || byte == '\n') byte = (char)file_bin_read_byte(fd);
     if (byte == '.' && !dot) {
       dot = true;
     } else if (!is_digit(byte) && byte != '+' && 
@@ -791,9 +790,8 @@ namespace ngs::fs {
     } else if (byte == '+' || byte == '-') {
       sign = true;
     }
-    if (byte == -1) goto finish;
-    str.resize(str.length() + 1, '\0');
-    str[str.length() - 1] = byte;
+    if (byte == 0) goto finish;
+    str.push_back(byte);
     if (sign) {
       byte = (char)file_bin_read_byte(fd);
       if (byte == '.' && !dot) {
@@ -801,9 +799,8 @@ namespace ngs::fs {
       } else if (!is_digit(byte) && byte != '.') {
         return strtod(str.c_str(), nullptr);
       }
-      if (byte == -1) goto finish;
-      str.resize(str.length() + 1, '\0');
-      str[str.length() - 1] = byte;
+      if (byte == 0) goto finish;
+      str.push_back(byte);
     }
     while (byte != '\n' && !(file_bin_position(fd) > file_bin_size(fd))) {
       message_pump();
@@ -817,40 +814,48 @@ namespace ngs::fs {
       } else if (byte == '\n' || file_bin_position(fd) > file_bin_size(fd)) {
         break;
       }
-      if (byte == -1) goto finish;
-      str.resize(str.length() + 1, '\0');
-      str[str.length() - 1] = byte;
+      if (byte == 0) goto finish;
+      str.push_back(byte);
     }
     finish:
     return strtod(str.c_str(), nullptr);
   }
 
   string file_text_read_string(int fd) {
-    int byte = -1; string str;
-    while ((char)byte != '\n' && !file_text_eof(fd)) {
+    int byte = file_bin_read_byte(fd); string str;
+    str.push_back((char)byte);
+    while ((char)byte != '\n') {
       message_pump();
       byte = file_bin_read_byte(fd);
-      str.resize(str.length() + 1, '\0');
-      str[str.length() - 1] = ((byte == -1) ? 0 : byte);
-      if (byte == -1) break;
+      str.push_back((char)byte);
+      if (byte == 0) break;
     }
-    if (str[str.length() - 2] != '\r' && str[str.length() - 1] == '\n') {
-      file_bin_seek(fd, -1);
-    }
-    if (str[str.length() - 2] == '\r' && str[str.length() - 1] == '\n') {
-      file_bin_seek(fd, -2);
+    if (str.length() >= 2) {
+      if (str[str.length() - 2] != '\r' && str[str.length() - 1] == '\n') {
+        file_bin_seek(fd, -1);
+        str = str.substr(0, str.length() - 1);
+      }
+      if (str[str.length() - 2] == '\r' && str[str.length() - 1] == '\n') {
+        file_bin_seek(fd, -2);
+        str = str.substr(0, str.length() - 2);
+      }
+    } else if (str.length() == 1) {
+      if (str[str.length() - 1] == '\n') {
+        file_bin_seek(fd, -1);
+        str = str.substr(0, str.length() - 1);
+      }
     }
     return str;
   }
 
   string file_text_readln(int fd) {
-    int byte = -1; string str;
-    while ((char)byte != '\n' && !file_text_eof(fd)) {
+    int byte = file_bin_read_byte(fd); string str;
+    str.push_back((char)byte);
+    while ((char)byte != '\n') {
       message_pump();
       byte = file_bin_read_byte(fd);
-      str.resize(str.length() + 1, '\0');
-      str[str.length() - 1] = ((byte == -1) ? 0 : byte);
-      if (byte == -1) break;
+      str.push_back((char)byte);
+      if (byte == 0) break;
     }
     return str;
   }
@@ -878,7 +883,7 @@ namespace ngs::fs {
     #if defined(_WIN32)
     if (_pipe(fd, str.length() + 1, O_BINARY) == -1) return -1;
     #else
-    if (pipe(fd) < 0) return -1;
+    if (pipe(fd) == -1) return -1;
     #endif
     if (file_text_write_string(fd[1], str) == -1) {
       file_bin_close(fd[0]);

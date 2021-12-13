@@ -72,6 +72,12 @@ EXPORTED_FUNCTION char *get_program_pathname() {
   return (char *)result.c_str();
 }
 
+EXPORTED_FUNCTION char *get_filedescriptor_pathname(double fd) {
+  static string result;
+  result = ngs::fs::get_filedescriptor_pathname((int)fd);
+  return (char *)result.c_str();
+}
+
 EXPORTED_FUNCTION char *filename_absolute(char *fname) {
   static string result;
   result = ngs::fs::filename_absolute(fname);

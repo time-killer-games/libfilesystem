@@ -24,19 +24,55 @@
  
 */
 
+#include <algorithm>
+#include <random>
+
 #include "filesystem.h"
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 using std::string;
 using std::vector;
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #define EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 #else /* macOS, Linux, and BSD */
 #define EXPORTED_FUNCTION extern "C" __attribute__((visibility("default")))
 #endif
 
+enum {
+  DC_ATOZ, // Alphabetical Order
+  DC_ZTOA, // Reverse Alphabetical Order
+  DC_OTON, // Date Modified Ordered Old to New
+  DC_NTOO, // Date Modified Ordered New to Old
+  DC_RAND  // Random Order
+};
+
 static vector<string> directory_contents;
 static unsigned directory_contents_index = 0;
+static unsigned directory_contents_order = DC_ATOZ;
+#if defined(_WIN32) 
+static std::wstring widen(string str) {
+  size_t wchar_count = str.size() + 1; vector<wchar_t> buf(wchar_count);
+  return std::wstring{ buf.data(), (size_t)MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, buf.data(), (int)wchar_count) };
+}
+#endif
+static time_t file_get_date_modified_time(std::string fname) {
+  int result = -1;
+  #if defined(_WIN32)
+  std::wstring wfname = widen(fname);
+  struct _stat info = { 0 }; 
+  result = _wstat(wfname.c_str(), &info);
+  #else
+  struct stat info = { 0 }; 
+  result = stat(fname, &info);
+  #endif
+  if (result == -1) return 0;
+  time_t time = info.st_mtime;
+  return time;
+}
 
 EXPORTED_FUNCTION char *get_working_directory() {
   static string result;
@@ -140,13 +176,39 @@ EXPORTED_FUNCTION double directory_contents_close() {
   return 0;
 }
 
+EXPORTED_FUNCTION double directory_contents_get_order() {
+  return directory_contents_order;
+}
+
+EXPORTED_FUNCTION double directory_contents_set_order(double order) {
+  directory_contents_order = (unsigned)order;
+  return 0;
+}
+
 EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, double includedirs, double recursive) {
   directory_contents_close();
   if (!recursive) directory_contents = ngs::fs::directory_contents(dname, pattern, includedirs);
   else directory_contents = ngs::fs::directory_contents_recursive(dname, pattern, includedirs);
-  if (directory_contents_index < directory_contents.size())
-  return (char *)directory_contents[directory_contents_index].c_str();
-  else return (char *)"";
+  if (directory_contents_index < directory_contents.size()) {
+    if (directory_contents_order == DC_ZTOA) {
+      std::reverse(directory_contents.begin(), directory_contents.end());
+    } else if (directory_contents_order == DC_OTON) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+        return (file_get_date_modified_time(l) < file_get_date_modified_time(r));
+      });
+    } else if (directory_contents_order == DC_NTOO) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+        return (file_get_date_modified_time(l) > file_get_date_modified_time(r));
+      });
+    } else if (directory_contents_order == DC_RAND) {
+      std::random_device rd; std::mt19937 g(rd());
+      std::shuffle(directory_contents.begin(), directory_contents.end(), g);
+    }
+    return (char*)directory_contents[directory_contents_index].c_str();
+  } 
+  return (char *)"";
 }
 
 EXPORTED_FUNCTION char *directory_contents_next() {

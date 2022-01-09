@@ -68,7 +68,7 @@ static time_t file_get_date_modified_time(std::string fname) {
   result = _wstat(wfname.c_str(), &info);
   #else
   struct stat info = { 0 }; 
-  result = stat(fname, &info);
+  result = stat(fname.c_str(), &info);
   #endif
   if (result == -1) return 0;
   time_t time = info.st_mtime;

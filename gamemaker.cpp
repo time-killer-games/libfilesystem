@@ -43,11 +43,15 @@ using std::vector;
 #endif
 
 enum {
-  DC_ATOZ, // Alphabetical Order
-  DC_ZTOA, // Reverse Alphabetical Order
-  DC_OTON, // Date Modified Ordered Old to New
-  DC_NTOO, // Date Modified Ordered New to Old
-  DC_RAND  // Random Order
+  DC_ATOZ,  // Alphabetical Order
+  DC_ZTOA,  // Reverse Alphabetical Order
+  DC_AOTON, // Date Accessed Ordered Old to New
+  DC_ANTOO, // Date Accessed Ordered New to Old
+  DC_MOTON, // Date Modified Ordered Old to New
+  DC_MNTOO, // Date Modified Ordered New to Old
+  DC_COTON, // Date Created Ordered Old to New
+  DC_CNTOO, // Date Created Ordered New to Old
+  DC_RAND   // Random Order
 };
 
 static vector<string> directory_contents;
@@ -59,7 +63,7 @@ static std::wstring widen(string str) {
   return std::wstring{ buf.data(), (size_t)MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, buf.data(), (int)wchar_count) };
 }
 #endif
-static time_t file_get_date_modified_time(std::string fname) {
+static time_t file_datetime_helper(std::string fname, int timestamp) {
   int result = -1;
   #if defined(_WIN32)
   std::wstring wfname = widen(fname);
@@ -70,47 +74,50 @@ static time_t file_get_date_modified_time(std::string fname) {
   result = stat(fname.c_str(), &info);
   #endif
   if (result == -1) return 0;
-  time_t time = info.st_mtime;
+  time_t time = 0;
+  if (timestamp == 0) time = info.st_atime;
+  if (timestamp == 1) time = info.st_mtime;
+  if (timestamp == 2) time = info.st_ctime;
   return time;
 }
 
-EXPORTED_FUNCTION char *get_working_directory() {
+EXPORTED_FUNCTION char *directory_get_current_working() {
   static string result;
-  result = ngs::fs::get_working_directory();
+  result = ngs::fs::directory_get_current_working();
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION double set_working_directory(char *dname) {
-  return ngs::fs::set_working_directory(dname);
+EXPORTED_FUNCTION double directory_set_current_working(char *dname) {
+  return ngs::fs::directory_set_current_working(dname);
 }
 
-EXPORTED_FUNCTION char *get_temp_directory() {
+EXPORTED_FUNCTION char *directory_get_temporary_path() {
   static string result;
-  result = ngs::fs::get_temp_directory();
+  result = ngs::fs::directory_get_temporary_path();
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION char *get_program_directory() {
+EXPORTED_FUNCTION char *executable_get_directory() {
   static string result;
-  result = ngs::fs::get_program_directory();
+  result = ngs::fs::executable_get_directory();
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION char *get_program_filename() {
+EXPORTED_FUNCTION char *executable_get_filename() {
   static string result;
-  result = ngs::fs::get_program_filename();
+  result = ngs::fs::executable_get_filename();
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION char *get_program_pathname() {
+EXPORTED_FUNCTION char *executable_get_pathname() {
   static string result;
-  result = ngs::fs::get_program_pathname();
+  result = ngs::fs::executable_get_pathname();
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION char *get_filedescriptor_pathname(double fd) {
+EXPORTED_FUNCTION char *file_bin_pathname(double fd) {
   static string result;
-  result = ngs::fs::get_filedescriptor_pathname((int)fd);
+  result = ngs::fs::file_bin_pathname((int)fd);
   return (char *)result.c_str();
 }
 
@@ -192,21 +199,41 @@ EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, dou
   if (directory_contents_index < directory_contents.size()) {
     if (directory_contents_order == DC_ZTOA) {
       std::reverse(directory_contents.begin(), directory_contents.end());
-    } else if (directory_contents_order == DC_OTON) {
+    } else if (directory_contents_order == DC_AOTON) {
       std::sort(directory_contents.begin(), directory_contents.end(),
       [](const std::string& l, const std::string& r) {
-        return (file_get_date_modified_time(l) < file_get_date_modified_time(r));
+      return (file_datetime_helper(l, 0) < file_datetime_helper(r, 0));
       });
-    } else if (directory_contents_order == DC_NTOO) {
+    } else if (directory_contents_order == DC_ANTOO) {
       std::sort(directory_contents.begin(), directory_contents.end(),
       [](const std::string& l, const std::string& r) {
-        return (file_get_date_modified_time(l) > file_get_date_modified_time(r));
+      return (file_datetime_helper(l, 0) > file_datetime_helper(r, 0));
+      });
+    } else if (directory_contents_order == DC_MOTON) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+      return (file_datetime_helper(l, 1) < file_datetime_helper(r, 1));
+      });
+    } else if (directory_contents_order == DC_MNTOO) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+      return (file_datetime_helper(l, 1) > file_datetime_helper(r, 1));
+      });
+    } else if (directory_contents_order == DC_COTON) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+      return (file_datetime_helper(l, 2) < file_datetime_helper(r, 2));
+      });
+    } else if (directory_contents_order == DC_CNTOO) {
+      std::sort(directory_contents.begin(), directory_contents.end(),
+      [](const std::string& l, const std::string& r) {
+      return (file_datetime_helper(l, 2) > file_datetime_helper(r, 2));
       });
     } else if (directory_contents_order == DC_RAND) {
       std::random_device rd; std::mt19937 g(rd());
       std::shuffle(directory_contents.begin(), directory_contents.end(), g);
     }
-    return (char*)directory_contents[directory_contents_index].c_str();
+  return (char*)directory_contents[directory_contents_index].c_str();
   } 
   return (char *)"";
 }
@@ -238,52 +265,148 @@ EXPORTED_FUNCTION char *environment_expand_variables(char *str) {
   return (char *)result.c_str();
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_year(char *fname) {
-  return ngs::fs::file_get_date_accessed_year(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_year(char *fname) {
+  return ngs::fs::file_datetime_accessed_year(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_month(char *fname) {
-  return ngs::fs::file_get_date_accessed_month(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_month(char *fname) {
+  return ngs::fs::file_datetime_accessed_month(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_day(char *fname) {
-  return ngs::fs::file_get_date_accessed_day(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_day(char *fname) {
+  return ngs::fs::file_datetime_accessed_day(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_hour(char *fname) {
-  return ngs::fs::file_get_date_accessed_hour(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_hour(char *fname) {
+  return ngs::fs::file_datetime_accessed_hour(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_minute(char *fname) {
-  return ngs::fs::file_get_date_accessed_minute(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_minute(char *fname) {
+  return ngs::fs::file_datetime_accessed_minute(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_accessed_second(char *fname) {
-  return ngs::fs::file_get_date_accessed_second(fname);
+EXPORTED_FUNCTION double file_datetime_accessed_second(char *fname) {
+  return ngs::fs::file_datetime_accessed_second(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_year(char *fname) {
-  return ngs::fs::file_get_date_modified_year(fname);
+EXPORTED_FUNCTION double file_datetime_modified_year(char *fname) {
+  return ngs::fs::file_datetime_modified_year(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_month(char *fname) {
-  return ngs::fs::file_get_date_modified_month(fname);
+EXPORTED_FUNCTION double file_datetime_modified_month(char *fname) {
+  return ngs::fs::file_datetime_modified_month(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_day(char *fname) {
-  return ngs::fs::file_get_date_modified_day(fname);
+EXPORTED_FUNCTION double file_datetime_modified_day(char *fname) {
+  return ngs::fs::file_datetime_modified_day(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_hour(char *fname) {
-  return ngs::fs::file_get_date_modified_hour(fname);
+EXPORTED_FUNCTION double file_datetime_modified_hour(char *fname) {
+  return ngs::fs::file_datetime_modified_hour(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_minute(char *fname) {
-  return ngs::fs::file_get_date_modified_minute(fname);
+EXPORTED_FUNCTION double file_datetime_modified_minute(char *fname) {
+  return ngs::fs::file_datetime_modified_minute(fname);
 }
 
-EXPORTED_FUNCTION double file_get_date_modified_second(char *fname) {
-  return ngs::fs::file_get_date_modified_second(fname);
+EXPORTED_FUNCTION double file_datetime_modified_second(char *fname) {
+  return ngs::fs::file_datetime_modified_second(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_year(char *fname) {
+  return ngs::fs::file_datetime_created_year(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_month(char *fname) {
+  return ngs::fs::file_datetime_created_month(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_day(char *fname) {
+  return ngs::fs::file_datetime_created_day(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_hour(char *fname) {
+  return ngs::fs::file_datetime_created_hour(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_minute(char *fname) {
+  return ngs::fs::file_datetime_created_minute(fname);
+}
+
+EXPORTED_FUNCTION double file_datetime_created_second(char *fname) {
+  return ngs::fs::file_datetime_created_second(fname);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_year(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_year((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_month(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_month((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_day(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_day((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_hour(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_hour((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_minute(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_minute((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_accessed_second(int fd) {
+  return ngs::fs::file_bin_datetime_accessed_second((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_year(int fd) {
+  return ngs::fs::file_bin_datetime_modified_year((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_month(int fd) {
+  return ngs::fs::file_bin_datetime_modified_month((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_day(int fd) {
+  return ngs::fs::file_bin_datetime_modified_day((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_hour(int fd) {
+  return ngs::fs::file_bin_datetime_modified_hour((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_minute(int fd) {
+  return ngs::fs::file_bin_datetime_modified_minute((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_modified_second(int fd) {
+  return ngs::fs::file_bin_datetime_modified_second((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_year(int fd) {
+  return ngs::fs::file_bin_datetime_created_year((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_month(int fd) {
+  return ngs::fs::file_bin_datetime_created_month((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_day(int fd) {
+  return ngs::fs::file_bin_datetime_created_day((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_hour(int fd) {
+  return ngs::fs::file_bin_datetime_created_hour((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_minute(int fd) {
+  return ngs::fs::file_bin_datetime_created_minute((double)fd);
+}
+
+EXPORTED_FUNCTION double file_bin_datetime_created_second(int fd) {
+  return ngs::fs::file_bin_datetime_created_second((double)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_open(char *fname, double mode) {

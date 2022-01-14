@@ -93,7 +93,7 @@ namespace ngs::fs {
         byte == '5' || byte == '6' || byte == '7' || byte == '8' || byte == '9');
     }
 
-    int file_get_date_accessed_modified(const char *fname, bool modified, int type) {
+    int file_datetime(std::string fname, int timestamp, int measurement) {
       int result = -1;
       #if defined(_WIN32)
       std::wstring wfname = widen(fname);
@@ -101,14 +101,17 @@ namespace ngs::fs {
       result = _wstat(wfname.c_str(), &info);
       #else
       struct stat info = { 0 }; 
-      result = stat(fname, &info);
+      result = stat(fname.c_str(), &info);
       #endif
-      time_t time = modified ? info.st_mtime : info.st_atime;
+      time_t time = 0; 
+      if (timestamp == 0) time = info.st_atime;
+      if (timestamp == 1) time = info.st_mtime;
+      if (timestamp == 2) time = info.st_ctime;
       if (result == -1) return result;
       #if defined(_WIN32)
       struct tm timeinfo = { 0 };
       if (localtime_s(&timeinfo, &time)) return -1;
-      switch (type) {
+      switch (measurement) {
         case  0: return timeinfo.tm_year + 1900;
         case  1: return timeinfo.tm_mon  + 1;
         case  2: return timeinfo.tm_mday;
@@ -119,7 +122,48 @@ namespace ngs::fs {
       }
       #else
       struct tm *timeinfo = std::localtime(&time);
-      switch (type) {
+      switch (measurement) {
+        case  0: return timeinfo->tm_year + 1900;
+        case  1: return timeinfo->tm_mon  + 1;
+        case  2: return timeinfo->tm_mday;
+        case  3: return timeinfo->tm_hour;
+        case  4: return timeinfo->tm_min;
+        case  5: return timeinfo->tm_sec;
+        default: return result;
+      }
+      #endif
+      return result;
+    }
+
+    int file_bin_datetime(int fd, int timestamp, int measurement) {
+      int result = -1;
+      #if defined(_WIN32)
+      struct _stat info = { 0 }; 
+      result = _fstat(fd, &info);
+      #else
+      struct stat info = { 0 }; 
+      result = fstat(fd, &info);
+      #endif
+      time_t time = 0; 
+      if (timestamp == 0) time = info.st_atime;
+      if (timestamp == 1) time = info.st_mtime;
+      if (timestamp == 2) time = info.st_ctime;
+      if (result == -1) return result;
+      #if defined(_WIN32)
+      struct tm timeinfo = { 0 };
+      if (localtime_s(&timeinfo, &time)) return -1;
+      switch (measurement) {
+        case  0: return timeinfo.tm_year + 1900;
+        case  1: return timeinfo.tm_mon  + 1;
+        case  2: return timeinfo.tm_mday;
+        case  3: return timeinfo.tm_hour;
+        case  4: return timeinfo.tm_min;
+        case  5: return timeinfo.tm_sec;
+        default: return result;
+      }
+      #else
+      struct tm *timeinfo = std::localtime(&time);
+      switch (measurement) {
         case  0: return timeinfo->tm_year + 1900;
         case  1: return timeinfo->tm_mon  + 1;
         case  2: return timeinfo->tm_mday;
@@ -206,26 +250,26 @@ namespace ngs::fs {
 
   } // anonymous namespace
 
-  string get_working_directory() {
+  string directory_get_current_working() {
     std::error_code ec;
     string result = filename_add_slash(std::filesystem::current_path(ec).u8string());
     return (ec.value() == 0) ? result : "";
   }
 
-  bool set_working_directory(string dname) {
+  bool directory_set_current_working(string dname) {
     std::error_code ec;
     const std::filesystem::path path = std::filesystem::u8path(dname);
     std::filesystem::current_path(path, ec);
     return (ec.value() == 0);
   }
 
-  string get_temp_directory() {
+  string directory_get_temporary_path() {
     std::error_code ec;
     string result = filename_add_slash(std::filesystem::temp_directory_path(ec).u8string());
     return (ec.value() == 0) ? result : "";
   }
 
-  string get_program_pathname() {
+  string executable_get_pathname() {
     string path;
     #if defined(_WIN32) 
     wchar_t buffer[MAX_PATH];
@@ -267,7 +311,7 @@ namespace ngs::fs {
     return path;
   }
 
-  string get_filedescriptor_pathname(int fd) {
+  string file_bin_pathname(int fd) {
     string path;
     #if defined(_WIN32)
     DWORD length; HANDLE file = (HANDLE)_get_osfhandle(fd);
@@ -308,12 +352,12 @@ namespace ngs::fs {
     return path;
   }
 
-  string get_program_directory() {
-    return filename_path(get_program_pathname());
+  string executable_get_directory() {
+    return filename_path(executable_get_pathname());
   }
 
-  string get_program_filename() {
-    return filename_name(get_program_pathname());
+  string executable_get_filename() {
+    return filename_name(executable_get_pathname());
   }
 
   string environment_get_variable(string name) {
@@ -629,64 +673,168 @@ namespace ngs::fs {
     return directory_copy_retained(dname, newname);
   }
 
-  int file_get_date_accessed_year(string fname) {
+  int file_datetime_accessed_year(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 0);
+    return file_datetime(fname.c_str(), 0, 0);
   }
 
-  int file_get_date_accessed_month(string fname) {
+  int file_datetime_accessed_month(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 1);
+    return file_datetime(fname.c_str(), 0, 1);
   }
 
-  int file_get_date_accessed_day(string fname) {
+  int file_datetime_accessed_day(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 2);
+    return file_datetime(fname.c_str(), 0, 2);
   }
 
-  int file_get_date_accessed_hour(string fname) {
+  int file_datetime_accessed_hour(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 3);
+    return file_datetime(fname.c_str(), 0, 3);
   }
 
-  int file_get_date_accessed_minute(string fname) {
+  int file_datetime_accessed_minute(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 4);
+    return file_datetime(fname.c_str(), 0, 4);
   }
 
-  int file_get_date_accessed_second(string fname) {
+  int file_datetime_accessed_second(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), false, 5);
+    return file_datetime(fname.c_str(), 0, 5);
   }
 
-  int file_get_date_modified_year(string fname) {
+  int file_datetime_modified_year(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 0);
+    return file_datetime(fname.c_str(), 1, 0);
   }
 
-  int file_get_date_modified_month(string fname) {
+  int file_datetime_modified_month(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 1);
+    return file_datetime(fname.c_str(), 1, 1);
   }
 
-  int file_get_date_modified_day(string fname) {
+  int file_datetime_modified_day(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 2);
+    return file_datetime(fname.c_str(), 1, 2);
   }
 
-  int file_get_date_modified_hour(string fname) {
+  int file_datetime_modified_hour(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 3);
+    return file_datetime(fname.c_str(), 1, 3);
   }
 
-  int file_get_date_modified_minute(string fname) {
+  int file_datetime_modified_minute(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 4);
+    return file_datetime(fname.c_str(), 1, 4);
   }
 
-  int file_get_date_modified_second(string fname) {
+  int file_datetime_modified_second(string fname) {
     fname = environment_expand_variables(fname);
-    return file_get_date_accessed_modified(fname.c_str(), true, 5);
+    return file_datetime(fname.c_str(), 1, 5);
+  }
+
+  int file_datetime_created_year(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 0);
+  }
+
+  int file_datetime_created_month(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 1);
+  }
+
+  int file_datetime_created_day(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 2);
+  }
+
+  int file_datetime_created_hour(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 3);
+  }
+
+  int file_datetime_created_minute(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 4);
+  }
+
+  int file_datetime_created_second(string fname) {
+    fname = environment_expand_variables(fname);
+    return file_datetime(fname.c_str(), 2, 5);
+  }
+
+  int file_bin_datetime_accessed_year(int fd) {
+    return file_bin_datetime(fd, 0, 0);
+  }
+
+  int file_bin_datetime_accessed_month(int fd) {
+
+    return file_bin_datetime(fd, 0, 1);
+  }
+
+  int file_bin_datetime_accessed_day(int fd) {
+    return file_bin_datetime(fd, 0, 2);
+  }
+
+  int file_bin_datetime_accessed_hour(int fd) {
+    return file_bin_datetime(fd, 0, 3);
+  }
+
+  int file_bin_datetime_accessed_minute(int fd) {
+    return file_bin_datetime(fd, 0, 4);
+  }
+
+  int file_bin_datetime_accessed_second(int fd) {
+    return file_bin_datetime(fd, 0, 5);
+  }
+
+  int file_bin_datetime_modified_year(int fd) {
+    return file_bin_datetime(fd, 1, 0);
+  }
+
+  int file_bin_datetime_modified_month(int fd) {
+    return file_bin_datetime(fd, 1, 1);
+  }
+
+  int file_bin_datetime_modified_day(int fd) {
+
+    return file_bin_datetime(fd, 1, 2);
+  }
+
+  int file_bin_datetime_modified_hour(int fd) {
+    return file_bin_datetime(fd, 1, 3);
+  }
+
+  int file_bin_datetime_modified_minute(int fd) {
+    return file_bin_datetime(fd, 1, 4);
+  }
+
+  int file_bin_datetime_modified_second(int fd) {
+    return file_bin_datetime(fd, 1, 5);
+  }
+
+  int file_bin_datetime_created_year(int fd) {
+    return file_bin_datetime(fd, 2, 0);
+  }
+
+  int file_bin_datetime_created_month(int fd) {
+    return file_bin_datetime(fd, 2, 1);
+  }
+
+  int file_bin_datetime_created_day(int fd) {
+    return file_bin_datetime(fd, 2, 2);
+  }
+
+  int file_bin_datetime_created_hour(int fd) {
+    return file_bin_datetime(fd, 2, 3);
+  }
+
+  int file_bin_datetime_created_minute(int fd) {
+    return file_bin_datetime(fd, 2, 4);
+  }
+
+  int file_bin_datetime_created_second(int fd) {
+    return file_bin_datetime(fd, 2, 5);
   }
 
   int file_bin_open(string fname, int mode) {
@@ -941,7 +1089,7 @@ namespace ngs::fs {
   }
 
   int file_text_open_from_string(string str) {
-    string fname = get_temp_directory() + "temp.XXXXXX";
+    string fname = directory_get_temporary_path() + "temp.XXXXXX";
     #if defined(_WIN32)
     int fd = -1; wstring wfname = widen(fname); 
     wchar_t *buffer = wfname.data(); if (_wmktemp_s(buffer, wfname.length() + 1)) return -1;

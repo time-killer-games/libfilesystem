@@ -52,6 +52,14 @@
 #include <sys/sysctl.h>
 #include <sys/user.h>
 #endif
+#if defined(__OpenBSD__)
+#include <sys/types.h>
+#include <sys/queue.h>
+#include <sys/mount.h>
+#include <glob.h>
+#include <kvm.h>
+#include <fts.h>
+#endif
 #include <unistd.h>
 #endif
 
@@ -62,6 +70,126 @@ using std::wstring;
 using std::string;
 using std::vector;
 using std::size_t;
+
+#if defined(__OpenBSD__)
+struct fuser {
+  TAILQ_ENTRY(fuser) tq;
+  uid_t uid;
+  pid_t pid;
+  int flags;
+};
+
+struct filearg {
+  SLIST_ENTRY(filearg) next;
+  dev_t dev;
+  ino_t ino;
+  char *name;
+  TAILQ_HEAD(fuserhead, fuser) fusers;
+};
+
+int fsflg = 0, cflg = 0, fuser = 0;
+static kvm_t *kd = nullptr; SLIST_HEAD(fileargs, filearg);
+struct fileargs fileargs = SLIST_HEAD_INITIALIZER(fileargs);
+
+static bool match(struct filearg *fa, struct kinfo_file *kf) {
+  if (fa->dev == kf->va_fsid) {
+    if (fa->ino == kf->va_fileid) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static int getfname(char *filename) {
+  static struct statfs *mntbuf = nullptr;
+  static int nmounts; int i = 0;
+  struct stat sb = { 0 };
+  struct filearg *cur = nullptr;
+  if (stat(filename, &sb)) {
+    return false;
+  }
+  if (fuser && !fsflg && S_ISBLK(sb.st_mode)) {
+    if (mntbuf == nullptr) {
+      nmounts = getmntinfo(&mntbuf, MNT_NOWAIT);
+      if (nmounts != -1) {
+        for (i = 0; i < nmounts; i++) {
+          if (!strcmp(mntbuf[i].f_mntfromname, filename)) {
+            if (stat(mntbuf[i].f_mntonname, &sb) == -1) {
+              return false;
+            }
+            cflg = 1;
+            break;
+          }
+        }
+      }
+    }
+  }
+  if (!fuser && S_ISSOCK(sb.st_mode)) {
+    char *newname = realpath(filename, nullptr);
+    if (newname != nullptr) filename = newname;
+  }
+  if ((cur = (struct filearg *)calloc(1, sizeof(*cur)))) {
+    if (!S_ISSOCK(sb.st_mode)) {
+      cur->ino = sb.st_ino;
+      cur->dev = sb.st_dev & 0xffff;
+    }
+    cur->name = filename;
+    TAILQ_INIT(&cur->fusers);
+    SLIST_INSERT_HEAD(&fileargs, cur, next);
+    return true;
+  }
+  return false;
+}
+
+static int compare(const FTSENT** one, const FTSENT** two) {
+  return (strcmp((*one)->fts_name, (*two)->fts_name));
+}
+
+static string find(struct kinfo_file *kif) {
+  FTS* file_system = nullptr;
+  FTSENT* child = nullptr;
+  FTSENT* parent = nullptr;
+  string result, path; glob_t glob_result;
+  memset(&glob_result, 0, sizeof(glob_result)); string pattern = "/*";
+  int return_value = glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);
+  if (return_value) {
+    globfree(&glob_result);
+  }
+  vector<char *> vec; char **arr = nullptr;
+  for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    if (ngs::fs::directory_exists(glob_result.gl_pathv[i])) {
+      vec.push_back(glob_result.gl_pathv[i]);
+    }
+  }
+  if (vec.size()) {
+    arr = new char *[vec.size()]();
+    std::copy(vec.begin(), vec.end(), arr);
+    if (arr) {
+      file_system = fts_open(arr, FTS_COMFOLLOW | FTS_NOCHDIR, &compare);
+      if (file_system) {
+        while ((parent = fts_read(file_system)) && path.empty()) {
+          child = fts_children(file_system, 0);
+          while (child && child->fts_link) {
+            child = child->fts_link;
+            result = child->fts_path + string(child->fts_name);
+            struct filearg *fa = nullptr; 
+            getfname((char *)result.c_str());
+            SLIST_FOREACH(fa, &fileargs, next) {
+              if (match(fa, kif)) {
+                path = fa->name;
+                break;
+              }
+            }
+          }
+        }
+        fts_close(file_system); 
+      }
+      delete[] arr;
+    }
+  }
+  return path;
+}
+#endif
 
 namespace ngs::fs {
 
@@ -347,6 +475,19 @@ namespace ngs::fs {
           p += kif->kf_structsize;
         }
       }
+    }
+    #elif defined(__OpenBSD__)
+    char errbuf[_POSIX2_LINE_MAX];
+    kinfo_file *kif = nullptr; int cntp = 0;
+    kd = kvm_openfiles(nullptr, nullptr, nullptr, KVM_NO_FILES, errbuf); if (!kd) return "";
+    if ((kif = kvm_getfiles(kd, KERN_FILE_BYPID, -1, sizeof(struct kinfo_file), &cntp))) {
+      for (int i = 0; i < cntp; i++) {
+        if (kif[i].fd_fd == fd) {
+          path = find(&kif[i]);
+          break;
+        }
+      }
+      free(kif);   
     }
     #endif
     return path;

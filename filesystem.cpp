@@ -146,9 +146,9 @@ static int compare(const FTSENT** one, const FTSENT** two) {
 }
 
 static string find(struct kinfo_file *kif) {
-  FTS* file_system = nullptr;
-  FTSENT* child = nullptr;
-  FTSENT* parent = nullptr;
+  FTS *file_system = nullptr;
+  FTSENT *child = nullptr;
+  FTSENT *parent = nullptr;
   string result, path; glob_t glob_result;
   memset(&glob_result, 0, sizeof(glob_result)); string pattern = "/*";
   int return_value = glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);

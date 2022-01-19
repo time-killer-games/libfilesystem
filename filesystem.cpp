@@ -1216,16 +1216,18 @@ namespace ngs::fs {
   string file_text_read_all(int fd) {
     string str;
     long sz = file_bin_size(fd);
-    vector<char> buffer(sz);
+    char *buffer = new char[sz];
     #if defined(_WIN32)
-    long result = _read(fd, &buffer[0], sz);
+    long result = _read(fd, buffer, sz);
     #else
-    long result = read(fd, &buffer[0], sz);
+    long result = read(fd, buffer, sz);
     #endif
     if (result == -1) {
+      delete[] buffer;
       return "";
     }
-    std::copy(str.begin(), str.end(), std::back_inserter(buffer));
+    str = buffer ? buffer : "";
+    delete[] buffer;
     return str;
   }
 

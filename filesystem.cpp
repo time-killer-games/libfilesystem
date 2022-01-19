@@ -155,7 +155,7 @@ namespace ngs::fs {
       FTSENT *parent = nullptr;
       string result, path; glob_t glob_result;
       memset(&glob_result, 0, sizeof(glob_result)); string pattern = "/*";
-      int return_value = glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);
+      int return_value = glob(pattern.c_str(), GLOB_TILDE, nullptr, &glob_result);
       if (return_value) {
         globfree(&glob_result);
       }
@@ -181,11 +181,12 @@ namespace ngs::fs {
                 SLIST_FOREACH(fa, &fileargs, next) {
                   if (match(fa, kif)) {
                     path = fa->name;
-                    break;
+                    goto finish;
                   }
                 }
               }
-            }
+            } 
+            finish:
             fts_close(file_system); 
           }
           delete[] arr;
@@ -1215,18 +1216,16 @@ namespace ngs::fs {
   string file_text_read_all(int fd) {
     string str;
     long sz = file_bin_size(fd);
-    char *buffer = new char[sz];
+    vector<char> buffer(sz);
     #if defined(_WIN32)
-    long result = _read(fd, buffer, sz);
+    long result = _read(fd, &buffer[0], sz);
     #else
-    long result = read(fd, buffer, sz);
+    long result = read(fd, &buffer[0], sz);
     #endif
     if (result == -1) {
-      delete[] buffer;
       return "";
     }
-    str = buffer ? buffer : "";
-    delete[] buffer;
+    std::copy(str.begin(), str.end(), std::back_inserter(buffer));
     return str;
   }
 

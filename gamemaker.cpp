@@ -337,76 +337,76 @@ EXPORTED_FUNCTION double file_datetime_created_second(char *fname) {
   return ngs::fs::file_datetime_created_second(fname);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_year(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_year((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_year(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_year((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_month(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_month((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_month(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_month((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_day(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_day((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_day(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_day((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_hour(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_hour((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_hour(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_hour((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_minute(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_minute((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_minute(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_minute((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_accessed_second(int fd) {
-  return ngs::fs::file_bin_datetime_accessed_second((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_accessed_second(double fd) {
+  return ngs::fs::file_bin_datetime_accessed_second((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_year(int fd) {
-  return ngs::fs::file_bin_datetime_modified_year((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_year(double fd) {
+  return ngs::fs::file_bin_datetime_modified_year((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_month(int fd) {
-  return ngs::fs::file_bin_datetime_modified_month((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_month(double fd) {
+  return ngs::fs::file_bin_datetime_modified_month((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_day(int fd) {
-  return ngs::fs::file_bin_datetime_modified_day((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_day(double fd) {
+  return ngs::fs::file_bin_datetime_modified_day((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_hour(int fd) {
-  return ngs::fs::file_bin_datetime_modified_hour((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_hour(double fd) {
+  return ngs::fs::file_bin_datetime_modified_hour((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_minute(int fd) {
-  return ngs::fs::file_bin_datetime_modified_minute((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_minute(double fd) {
+  return ngs::fs::file_bin_datetime_modified_minute((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_modified_second(int fd) {
-  return ngs::fs::file_bin_datetime_modified_second((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_modified_second(double fd) {
+  return ngs::fs::file_bin_datetime_modified_second((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_year(int fd) {
-  return ngs::fs::file_bin_datetime_created_year((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_year(double fd) {
+  return ngs::fs::file_bin_datetime_created_year((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_month(int fd) {
-  return ngs::fs::file_bin_datetime_created_month((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_month(double fd) {
+  return ngs::fs::file_bin_datetime_created_month((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_day(int fd) {
-  return ngs::fs::file_bin_datetime_created_day((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_day(double fd) {
+  return ngs::fs::file_bin_datetime_created_day((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_hour(int fd) {
-  return ngs::fs::file_bin_datetime_created_hour((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_hour(double fd) {
+  return ngs::fs::file_bin_datetime_created_hour((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_minute(int fd) {
-  return ngs::fs::file_bin_datetime_created_minute((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_minute(double fd) {
+  return ngs::fs::file_bin_datetime_created_minute((int)fd);
 }
 
-EXPORTED_FUNCTION double file_bin_datetime_created_second(int fd) {
-  return ngs::fs::file_bin_datetime_created_second((double)fd);
+EXPORTED_FUNCTION double file_bin_datetime_created_second(double fd) {
+  return ngs::fs::file_bin_datetime_created_second((int)fd);
 }
 
 EXPORTED_FUNCTION double file_bin_open(char *fname, double mode) {

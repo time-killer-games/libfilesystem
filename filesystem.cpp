@@ -87,7 +87,7 @@ namespace ngs::fs {
       FTS *file_system = nullptr;
       FTSENT *child = nullptr;
       FTSENT *parent = nullptr;
-      string result, path; glob_t globres;
+      string result, path; glob_t globres = { 0 };
       memset(&globres, 0, sizeof(globres)); string pattern = "/*";
       int globerr = glob(pattern.c_str(), GLOB_TILDE, nullptr, &globres);
       vector<char *> vec; char **arr = nullptr;

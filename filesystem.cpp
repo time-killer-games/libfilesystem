@@ -301,13 +301,14 @@ namespace ngs::fs {
       }
     }
     #elif defined(__OpenBSD__)
-    size_t length = 0; 
+    char **buffer = nullptr; size_t length = 0; 
     int mib[4] = { CTL_KERN, KERN_PROC_ARGS, getpid(), KERN_PROC_ARGV };
     if (sysctl(mib, 4, nullptr, &length, nullptr, 0) == 0) {
-      path.resize(length, '\0');
-      char *buffer = path.data();
-      if (sysctl(mib, 4, buffer, &length, nullptr, 0) == 0) {
-        path = string(buffer[0]) + "\0";
+      if ((buffer = (char **)malloc(length))) {
+        if (sysctl(mib, 4, buffer, &length, nullptr, 0) == 0) {
+          path = string(buffer[0]) + "\0";
+        }
+        free(buffer);
       }
     }
     #endif

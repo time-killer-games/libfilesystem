@@ -24,6 +24,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filesystem.h" />
+    <ClInclude Include="filesystem.hpp" />
+    <ClInclude Include="gamemaker.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

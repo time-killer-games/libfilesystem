@@ -24,8 +24,6 @@
  
 */
 
-#include "filesystem.h"
-
 #if defined(_WIN32)
 #define EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 #else /* macOS, Linux, and BSD */

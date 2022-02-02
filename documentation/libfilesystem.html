@@ -3,12 +3,12 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title></title>
-	<meta name="generator" content="LibreOffice 7.2.1.2 (OpenBSD)"/>
+	<meta name="generator" content="LibreOffice 6.4.7.2 (Linux)"/>
 	<meta name="created" content="2022-01-24T16:20:59.744056135"/>
-	<meta name="changed" content="2022-01-27T21:07:46.745678234"/>
+	<meta name="changed" content="2022-02-01T20:38:51.183435743"/>
 	<style type="text/css">
 		@page { size: 8.5in 11in; margin-left: 0.79in; margin-right: 0.39in; margin-top: 0.39in; margin-bottom: 0.39in }
-		p { line-height: 115%; margin-bottom: 0.1in; background: transparent; background: transparent }
+		p { margin-bottom: 0.1in; background: transparent; line-height: 115%; background: transparent }
 		a:link { color: #000080; so-language: zxx; text-decoration: underline }
 		a:visited { color: #800000; so-language: zxx; text-decoration: underline }
 	</style>
@@ -382,37 +382,179 @@ this order:</span></font></font></font></p>
 <br/>
 
 </p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">enum
-{</span></b></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_ATOZ,
-</b><span style="font-weight: normal">// Alphabetical Order</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_ZTOA,
-</b><span style="font-weight: normal">// Reverse Alphabetical Order</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_AOTON,
-</b><span style="font-weight: normal">// Date Accessed Ordered Old to
-New</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_ANTOO,
-</b><span style="font-weight: normal">// Date Accessed Ordered New to
-Old</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_MOTON,
-</b><span style="font-weight: normal">// Date Modified Ordered Old to
-New</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_MNTOO,
-</b><span style="font-weight: normal">// Date Modified Ordered New to
-Old</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_COTON,
-</b><span style="font-weight: normal">// Date Created Ordered Old to
-New</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_CNTOO,
-</b><span style="font-weight: normal">// Date Created Ordered New to
-Old</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>DC_RAND
-</b><span style="font-weight: normal">// Random Order</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">};</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">//
+Directory Contents</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_ATOZ  0 // Alphabetical Order</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_ZTOA  1 // Reverse Alphabetical Order</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_AOTON 2 // Date Accessed Ordered Old to New</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_ANTOO 3 // Date Accessed Ordered New to Old</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_MOTON 4 // Date Modified Ordered Old to New</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_MNTOO 5 // Date Modified Ordered New to Old</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_COTON 6 // Date Created Ordered Old to New</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_CNTOO 7 // Date Created Ordered New to Old</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+DC_RAND  8 // Random Order</span></b></font></font></font></p>
 <p><br/>
 <br/>
 
 </p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#00a933"><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">real</span></font></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">directory_contents_get_cntfiles()</span></font></font></font></p>
+<p><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">The
+function returns the number of counted files and/or directories that
+were iterated through from a previous call to
+directory_contents_first(). Note a call to directory_contents_first()
+will store the entire array of files and directories that match the
+given criteria in advance to predetermine the return value of later</span></font></font></font><font color="#ffffff"><span style="background: transparent">
+</span></font><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">calls
+to directory_contents_next() thereafter, and
+directory_contents_get_cntfiles() will return the entire number of
+files and directories that were iterated through</span></font></font></font><font color="#ffffff"><span style="background: transparent">
+</span></font><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">by
+the call to</span></font></font></font><font color="#ffffff"><span style="background: transparent">
+</span></font><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">directory_contents_first()
+internally. directory_contents_get_cntfiles() will return the same
+result regardless of whether it is called before or after any number
+of calls to directory_contents_next(). </span></font></font></font>
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">The
+thing to remember is it needs to be called after at least one call to
+directory_contents_first() and it will already return the value you
+need at that point. directory_contents_get_cntfiles() does not return
+the value of the number of files or directories</span></font></font></font><font color="#ffffff"><span style="background: transparent">
+</span></font><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">that
+match the criteria specified by directory_contents_first(). It
+returns every single file and/or</span></font></font></font><font color="#ffffff"><span style="background: transparent">
+</span></font><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">directory
+in the search provided by directory_contents_first(), regardless of
+the amount of files and/or directories which matched the criteria.
+The default return value is one. If more than one file and/or
+directory is searched through, the return value is increased to be
+that total number of files and/or directories which were iterated
+through in the search.</span></font></font></font></p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#00a933"><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">real</span></font></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">directory_contents_get_maxfiles()</span></font></font></font></p>
+<p><font color="#ffffff"><font size="3" style="font-size: 12pt"><font face="Source Code Pro Black"><span style="background: transparent">The
+function returns the maximum number of files and/or directories to
+search through in a call to directory_contents_first() before ending
+the search that is</span></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><span style="background: transparent">looking</span></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><span style="background: transparent">for
+the specified criteria in the arguments passed to
+directory_contents_first(). Returns zero by default. The return value
+of this function may be set by directory_contents_set_maxfiles().</span></font></font></font></p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#00a933"><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">real</span></font></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">directory_contents_set_maxfiles(real</span></font></font><span style="background: transparent">
+</span><font face="Source Code Pro Black"><font size="5" style="font-size: 18pt"><span style="background: transparent">maxfiles)</span></font></font></font></p>
+<p><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">The
+function sets the maximum number of files to search through for
+testing against whether they match the criteria of the arguments
+passed to directory_contents_first(). Pass zero to the maxfiles
+argument to represent no maximum value and allow for there to be zero
+limitations in place. Using no limitation can cause a search to take
+a very long time when searching directories with many files or
+directories in them, so it is preferred to set a limitation of some
+kind in applications that shall block the main thread while the
+search is being performed by directory_contents_first(). </span></font></font></font>
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">Otherwise,
+the user might mistake the search for the program not responding or
+get tired of waiting for it to finish. The directory_contents_first()
+and directory_contents_next() functions are not thread-safe and
+should only be called from a single-thread at a time. In a
+multi-threaded application, you may provide a progress indicator
+using an implementation of your choosing but you it is wise to allow
+for a means to cancel the search and force the thread to quit its
+execution while also being asynchronous and non-blocking when
+possible.</span></font></font></font></p>
+<p><br/>
+<br/>
+
+</p>
+<p><font color="#ffffff"><font face="Source Code Pro Black"><font size="3" style="font-size: 12pt"><span style="background: transparent">Test
+for equality, (and not less-than, or less-than-or-equal-to), between
+directory_contents_get_cntfiles() and
+directory_contents_get_maxfiles(), and, if the two are equal, let
+this be a means to cancel the operation of looping through following
+calls to directory_contents_next(), which will apply the proper
+limitations set by directory_contents_set_maxfiles() and prevent
+undesirable hanging of the main thread when running in a
+single-threaded application or program. This will helps improve user
+experience where such behavior in an application is at all
+acceptable. Otherwise it is in most cases better to write a
+multi-threaded application. This function has no return value.</span></font></font></font></p>
 <p><br/>
 <br/>
 
@@ -1100,21 +1242,18 @@ may be one of the following values:</span></span></font></font></font></p>
 <br/>
 
 </p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">enum
-{</span></b></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>O_RDONLY,</b>
-<span style="font-weight: normal">// Open the file for Reading-Only</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>O_WRONLY,</b>
-<span style="font-weight: normal">// Open the file for Writing-Only</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>O_RDWR,</b>
-<span style="font-weight: normal">// Open the file for Reading and
-Writing</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>O_APPEND,</b>
-<span style="font-weight: normal">// Open the file for Appending</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><span style="background: transparent"><b>O_RDAP</b>
-<span style="font-weight: normal">// Open the file for Reading and
-Appending</span></span></font></font></font></p>
-<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">};</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">//
+File Descriptors</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+FD_RDONLY 0 // Opened as Read-Only</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+FD_WRONLY 1 // Opened as Write-Only</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+FD_RDWR 2 // Reading and Writing</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+FD_APPEND 3 // Opened for Appending</span></b></font></font></font></p>
+<p><font color="#666666"><font face="Source Code Pro Black"><font size="2" style="font-size: 10pt"><b><span style="background: transparent">#define
+FD_RDAP 4 // Reading and Appending</span></b></font></font></font></p>
 <p><br/>
 <br/>
 
@@ -1129,6 +1268,10 @@ descriptor pointed to in fd, and resets the seek position of the file
 descriptor to zero, leaving the file with empty contents, which is
 useful for rewriting a file from scratch with completely new or
 different contents. Returns zero on success, and -1 on failure.</span></font></font></font></p>
+<p><br/>
+<br/>
+
+</p>
 <p><br/>
 <br/>
 

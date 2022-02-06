@@ -9,7 +9,7 @@ elif [ $(uname) = "FreeBSD" ]; then
 elif [ $(uname) = "DragonFly" ]; then
   g++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.so" -shared -std=c++20 -static-libgcc -static-libstdc++ -fPIC;
 elif [ $(uname) = "OpenBSD" ]; then
-  clang++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.so" -shared -std=c++20 -lc -fPIC;
+  clang++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.so" -shared -std=c++20 -lkvm -lc -lpthread -fPIC;
 else
   g++ "filesystem.cpp" "gamemaker.cpp" -o "libfilesystem.dll" -shared -std=c++20 -static-libgcc -static-libstdc++ -static;
 fi;

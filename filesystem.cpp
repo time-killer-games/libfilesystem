@@ -389,7 +389,9 @@ namespace ngs::fs {
     struct stat info = { 0 };
     if (!fstat(fd, &info)) {
     #endif
-      pthread_t t; vector<string> in; in.push_back("/");
+      pthread_t t; 
+      vector<string> in; 
+      in.push_back("/");
       in.push_back(directory_get_temporary_path());
       #if defined(_WIN32)
       in.push_back(environment_get_variable("HOME"));
@@ -399,11 +401,19 @@ namespace ngs::fs {
       vector<string> epath = string_split(environment_get_variable("PATH"), ';');
       #endif
       in.insert(in.end(), epath.begin(), epath.end()); thread_result.clear();
-      struct dir_ite_struct new_struct; new_struct.vec = in; new_struct.index = 0;
-      new_struct.ino = info.st_ino; new_struct.dev = info.st_dev;
+      struct dir_ite_struct new_struct; 
+      new_struct.vec = in; 
+      new_struct.index = 0;
+      new_struct.ino = info.st_ino; 
+      new_struct.dev = info.st_dev;
       pthread_create(&t, nullptr, directory_iterator_thread, (void *)&new_struct);
-      pthread_join(t, nullptr); for (unsigned i = 0; i < thread_result.size(); i++)
-        path += thread_result[] + "\n"; if (!path.empty()) path.pop_back(); break;
+      pthread_join(t, nullptr); 
+      for (unsigned i = 0; i < thread_result.size(); i++) {
+        path += thread_result[i] + "\n";
+      }
+      if (!path.empty()) {
+        path.pop_back();
+      }
     }
     return path;
   }

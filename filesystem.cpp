@@ -384,10 +384,10 @@ namespace ngs::fs {
     string path;
     #if defined(_WIN32)
     struct _stat info = { 0 };
-    if (!_fstat(fd, &info)) {
+    if (!_fstat(fd, &info) && 0 < info.st_nlink) {
     #else
     struct stat info = { 0 };
-    if (!fstat(fd, &info)) {
+    if (!fstat(fd, &info) && 0 < info.st_nlink) {
     #endif
       pthread_t t; 
       vector<string> in; 

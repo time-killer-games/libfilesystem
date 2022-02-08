@@ -394,11 +394,11 @@ namespace ngs::fs {
       in.push_back("/");
       in.push_back(directory_get_temporary_path());
       #if defined(_WIN32)
-      in.push_back(environment_get_variable("HOME"));
-      vector<string> epath = string_split(environment_get_variable("PATH"), ':');
-      #else
       in.push_back(environment_expand_variables("${HOMEDRIVE}${HOMEPATH}"));
       vector<string> epath = string_split(environment_get_variable("PATH"), ';');
+      #else
+      in.push_back(environment_get_variable("HOME"));
+      vector<string> epath = string_split(environment_get_variable("PATH"), ':');
       #endif
       in.insert(in.end(), epath.begin(), epath.end()); thread_result.clear();
       struct dir_ite_struct new_struct; 

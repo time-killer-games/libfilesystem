@@ -420,7 +420,7 @@ namespace ngs::fs {
       new_struct.dev      = info.dwVolumeSerialNumber;
       new_struct.fd       = fd;
       #else
-      new_struct.nlink    = info.st_nlinks;
+      new_struct.nlink    = info.st_nlink;
       new_struct.ino      = info.st_ino; 
       new_struct.dev      = info.st_dev;
       #endif

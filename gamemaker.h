@@ -36,7 +36,7 @@ EXPORTED_FUNCTION char *directory_get_temporary_path();
 EXPORTED_FUNCTION char *executable_get_directory();
 EXPORTED_FUNCTION char *executable_get_filename();
 EXPORTED_FUNCTION char *executable_get_pathname();
-EXPORTED_FUNCTION char *file_bin_pathname(double fd, char *dnames);
+EXPORTED_FUNCTION char *file_bin_pathnames(double fd, char *dnames, double recursive);
 EXPORTED_FUNCTION char *filename_absolute(char *fname);
 EXPORTED_FUNCTION char *filename_canonical(char *fname);
 EXPORTED_FUNCTION double file_exists(char *fname);

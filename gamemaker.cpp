@@ -63,9 +63,9 @@ char *executable_get_pathname() {
   return (char *)result.c_str();
 }
 
-char *file_bin_pathname(double fd) {
+char *file_bin_pathname(double fd, char *dnames) {
   static string result;
-  result = ngs::fs::file_bin_pathname((int)fd);
+  result = ngs::fs::file_bin_pathname((int)fd, dnames);
   return (char *)result.c_str();
 }
 

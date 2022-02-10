@@ -524,7 +524,7 @@ namespace ngs::fs {
     return 0;
   }
 
-  string file_bin_hardlinks(string fname, string dnames, bool recursive) {
+  string file_hardlinks(string fname, string dnames, bool recursive) {
     string paths;
     if (file_exists(fname)) {
       file_pathnames_result.clear();

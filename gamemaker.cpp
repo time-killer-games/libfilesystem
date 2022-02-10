@@ -63,9 +63,33 @@ char *executable_get_pathname() {
   return (char *)result.c_str();
 }
 
-char *file_bin_pathnames(double fd, char *dnames, double recursive) {
+double symlink_create(char *fname, char *newname) {
+  return ngs::fs::symlink_create(fname, newname);
+}
+
+double symlink_copy(char *fname, char *newname) {
+  return ngs::fs::symlink_copy(fname, newname);
+}
+
+double symlink_exists(char *fname) {
+  return ngs::fs::symlink_exists(fname);
+}
+
+double hardlink_create(char *fname, char *newname) {
+  return ngs::fs::hardlink_create(fname, newname);
+}
+
+double file_numblinks(char *fname) {
+  return (double)ngs::fs::file_numblinks(fname);
+}
+
+double file_bin_numblinks(double fd) {
+  return (double)ngs::fs::file_bin_numblinks((int)fd);
+}
+
+char *file_bin_hardlinks(double fd, char *dnames, double recursive) {
   static string result;
-  result = ngs::fs::file_bin_pathnames((int)fd, dnames, (bool)recursive);
+  result = ngs::fs::file_bin_hardlinks((int)fd, dnames, (bool)recursive);
   return (char *)result.c_str();
 }
 
@@ -79,6 +103,10 @@ char *filename_canonical(char *fname) {
   static string result;
   result = ngs::fs::filename_canonical(fname);
   return (char *)result.c_str();
+}
+
+double filename_equivalent(char *fname1, char *fname2) {
+  return ngs::fs::filename_equivalent(fname1, fname2);
 }
 
 double file_exists(char *fname) {

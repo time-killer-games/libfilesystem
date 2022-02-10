@@ -296,6 +296,7 @@ namespace ngs::fs {
           int fd = -1;
           BY_HANDLE_FILE_INFORMATION info = { 0 };
           if (file_exists(file_path.string())) {
+            // printf("%s\n", file_path.string().c_str());
             if (!_wsopen_s(&fd, file_path.wstring().c_str(), _O_RDONLY, _SH_DENYNO, _S_IREAD)) {
               bool success = GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info);
               bool matches = (info.nFileIndexHigh == s->ino_high && info.nFileIndexLow == s->ino_low && info.dwVolumeSerialNumber == s->dev);
@@ -329,19 +330,13 @@ namespace ngs::fs {
           }
           #endif
           if (s->recursive && directory_exists(file_path.string())) {
-            std::set<string> set; 
-            unsigned prevsz = s->vec.size() - 1; 
+            // printf("%s\n", file_path.string().c_str());
             s->vec.push_back(file_path.string());
-            for (unsigned i = 0; i < s->vec.size(); i++) {
-              message_pump(); set.insert(s->vec[i]);
-            }
-            s->vec.assign(set.begin(), set.end()); 
-            if (prevsz < s->vec.size()) s->index++; 
-            file_bin_pathnames_helper(s);
+            s->index++; file_bin_pathnames_helper(s);
           }
         }
       }
-      while (s->index < s->vec.size()) {
+      while (s->index < s->vec.size() - 1) {
         message_pump(); s->index++;
         file_bin_pathnames_helper(s);
       }
@@ -497,8 +492,10 @@ namespace ngs::fs {
     string post = str.substr(str.find("${") + 2);
     if (post.find('}') == string::npos) return str;
     string variable = post.substr(0, post.find('}'));
-    post = post.substr(post.find('}') + 1);
+    size_t pos = post.find('}') + 1; post = post.substr(pos);
     string value = environment_get_variable(variable);
+    if (value.empty()) return str.substr(0, pos) + 
+    environment_expand_variables(str.substr(pos));
     return environment_expand_variables(pre + value + post);
   }
 

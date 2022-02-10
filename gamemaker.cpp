@@ -87,6 +87,12 @@ double file_bin_numblinks(double fd) {
   return (double)ngs::fs::file_bin_numblinks((int)fd);
 }
 
+char *file_hardlinks(char *fname, char *dnames, double recursive) {
+  static string result;
+  result = ngs::fs::file_hardlinks(fname, dnames, (bool)recursive);
+  return (char *)result.c_str();
+}
+
 char *file_bin_hardlinks(double fd, char *dnames, double recursive) {
   static string result;
   result = ngs::fs::file_bin_hardlinks((int)fd, dnames, (bool)recursive);

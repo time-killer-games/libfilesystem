@@ -42,6 +42,7 @@ EXPORTED_FUNCTION double symlink_exists(char *fname);
 EXPORTED_FUNCTION double hardlink_create(char *fname, char *newname);
 EXPORTED_FUNCTION double file_numblinks(char *fname);
 EXPORTED_FUNCTION double file_bin_numblinks(double fd);
+EXPORTED_FUNCTION char *file_hardlinks(char *fname, char *dnames, double recursive);
 EXPORTED_FUNCTION char *file_bin_hardlinks(double fd, char *dnames, double recursive);
 EXPORTED_FUNCTION char *filename_absolute(char *fname);
 EXPORTED_FUNCTION char *filename_canonical(char *fname);

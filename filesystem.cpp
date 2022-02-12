@@ -242,7 +242,7 @@ namespace ngs::fs {
     string expand_without_trailing_slash(string dname) {
       std::error_code ec;
       dname = environment_expand_variables(dname);
-	  ghc::filesystem::path p = ghc::filesystem::path(dname);
+      ghc::filesystem::path p = ghc::filesystem::path(dname);
       p = ghc::filesystem::weakly_canonical(p, ec);
       dname = p.string();
       if (ec.value() != 0) return "";
@@ -921,7 +921,7 @@ namespace ngs::fs {
           }
         }
       }
-	} else {
+    } else {
       return false;
     }
     return true;
@@ -942,7 +942,7 @@ namespace ngs::fs {
       }
       ghc::filesystem::rename(path1, path2, ec);
       return (ec.value() == 0);
-	} else {
+    } else {
       return false;
     }
     return true;

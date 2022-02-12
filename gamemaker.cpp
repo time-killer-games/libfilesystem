@@ -198,6 +198,10 @@ char *environment_get_variable(char *name) {
   return (char *)result.c_str();
 }
 
+double environment_get_variable_exists(char *name) {
+  return ngs::fs::environment_get_variable_exists(name);
+}
+
 double environment_set_variable(char *name, char *value) {
   return ngs::fs::environment_set_variable(name, value);
 }

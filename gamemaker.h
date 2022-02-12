@@ -66,6 +66,7 @@ EXPORTED_FUNCTION double directory_contents_set_maxfiles(double order);
 EXPORTED_FUNCTION char *directory_contents_first(char *dname, char *pattern, double includedirs, double recursive);
 EXPORTED_FUNCTION char *directory_contents_next();
 EXPORTED_FUNCTION char *environment_get_variable(char *name);
+EXPORTED_FUNCTION double environment_get_variable_exists(char *name);
 EXPORTED_FUNCTION double environment_set_variable(char *name, char *value);
 EXPORTED_FUNCTION double environment_unset_variable(char *name);
 EXPORTED_FUNCTION char *environment_expand_variables(char *str);

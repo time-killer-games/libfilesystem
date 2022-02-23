@@ -158,6 +158,10 @@ double directory_contents_close() {
   return 0;
 }
 
+double directory_contents_get_length() {
+  return ngs::fs::directory_contents_get_length();
+}
+
 double directory_contents_get_order() {
   return ngs::fs::directory_contents_get_order();
 }
@@ -184,6 +188,20 @@ char *directory_contents_first(char *dname, char *pattern, double includedirs, d
   static string result;
   result = ngs::fs::directory_contents_first(dname, pattern, includedirs, recursive);
   return (char *)result.c_str();
+}
+
+double directory_contents_first_async(char *dname, char *pattern, double includedirs, double recursive) {
+  ngs::fs::directory_contents_first_async(dname, pattern, (bool)includedirs, (bool)recursive);
+  return 0;
+}
+
+double directory_contents_get_completion_status() {
+  return ngs::fs::directory_contents_get_completion_status();
+}
+
+double directory_contents_set_completion_status(double complete) {
+  ngs::fs::directory_contents_set_completion_status((bool)complete);
+  return 0;
 }
 
 char *directory_contents_next() {

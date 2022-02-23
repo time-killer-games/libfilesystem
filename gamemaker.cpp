@@ -190,9 +190,10 @@ char *directory_contents_first(char *dname, char *pattern, double includedirs, d
   return (char *)result.c_str();
 }
 
-double directory_contents_first_async(char *dname, char *pattern, double includedirs, double recursive) {
-  ngs::fs::directory_contents_first_async(dname, pattern, (bool)includedirs, (bool)recursive);
-  return 0;
+char *directory_contents_first_async(char *dname, char *pattern, double includedirs, double recursive) {
+  static string result;
+  result = ngs::fs::directory_contents_first_async(dname, pattern, includedirs, recursive);
+  return (char *)result.c_str();
 }
 
 double directory_contents_get_completion_status() {

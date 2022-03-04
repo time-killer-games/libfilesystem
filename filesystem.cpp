@@ -511,8 +511,8 @@ namespace ngs::fs {
     return 0;
   }
 
-vector<string> file_bin_hardlinks(int fd, vector<string> dnames, bool recursive) {
-    vector<string> paths;
+string file_bin_hardlinks(int fd, string dnames, bool recursive) {
+    string paths;
     #if defined(_WIN32)
     BY_HANDLE_FILE_INFORMATION info = { 0 };
     if (GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info) && info.nNumberOfLinks) {
@@ -522,17 +522,23 @@ vector<string> file_bin_hardlinks(int fd, vector<string> dnames, bool recursive)
     #endif
       file_bin_hardlinks_result.clear();
       struct file_bin_hardlinks_struct s; 
+      vector<string> in = string_split(dnames, '\n');
       vector<string> first;
-      first.push_back(dnames[0]);
-      dnames.erase(dnames.begin());
+      first.push_back(in[0]);
+      in.erase(in.begin());
       s.x               = first;
-      s.y               = dnames;
+      s.y               = in;
       s.i               = 0;
       s.j               = 0;
       s.recursive       = recursive;
       s.info            = info;
       file_bin_hardlinks_helper(&s);
-      paths = file_bin_hardlinks_result;
+      for (unsigned i = 0; i < file_bin_hardlinks_result.size(); i++) {
+        message_pump(); paths += file_bin_hardlinks_result[i] + "\n";
+      }
+      if (!paths.empty()) {
+        paths.pop_back();
+      }
     }
     return paths;
   }

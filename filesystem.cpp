@@ -511,7 +511,7 @@ namespace ngs::fs {
     return 0;
   }
 
-string file_bin_hardlinks(int fd, string dnames, bool recursive) {
+  string file_bin_hardlinks(int fd, string dnames, bool recursive) {
     string paths;
     #if defined(_WIN32)
     BY_HANDLE_FILE_INFORMATION info = { 0 };

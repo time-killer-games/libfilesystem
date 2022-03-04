@@ -273,9 +273,11 @@ namespace ngs::fs {
     }
 
     struct file_bin_hardlinks_struct {
-      vector<string> vec;
+      vector<string> x;
+      vector<string> y;
       bool recursive;
-      unsigned index;
+      unsigned i;
+      unsigned j;
       #if defined(_WIN32)
       BY_HANDLE_FILE_INFORMATION info;
       #else
@@ -283,8 +285,6 @@ namespace ngs::fs {
       #endif
     };
 
-    /* ghc::filesystem::equivalent would be useful here but sadly it does 
-    not support passing a file descriptor and only accepts a file path */
     vector<string> file_bin_hardlinks_result;
     void file_bin_hardlinks_helper(file_bin_hardlinks_struct *s) {
       #if defined(_WIN32)
@@ -292,67 +292,65 @@ namespace ngs::fs {
       #else
       if (file_bin_hardlinks_result.size() >= s->info.st_nlink) return;
       #endif
-      std::error_code ec; if (!directory_exists(s->vec[s->index])) return;
-      s->vec[s->index] = expand_without_trailing_slash(s->vec[s->index]);
-      const ghc::filesystem::path path = ghc::filesystem::path(s->vec[s->index]);
-      if (directory_exists(s->vec[s->index]) || path.root_name().string() + "\\" == path.string()) {
-        ghc::filesystem::directory_iterator end_itr;
-        for (ghc::filesystem::directory_iterator dir_ite(path, ec); dir_ite != end_itr; dir_ite.increment(ec)) {
-          message_pump(); if (ec.value() != 0) { break; }
-          ghc::filesystem::path file_path = ghc::filesystem::path(filename_absolute(dir_ite->path().string()));
-          #if defined(_WIN32)
-          int fd = -1;
-          BY_HANDLE_FILE_INFORMATION info = { 0 };
-          if (file_exists(file_path.string())) {
-            // printf("%s\n", file_path.string().c_str());
-            if (!_wsopen_s(&fd, file_path.wstring().c_str(), _O_RDONLY, _SH_DENYNO, _S_IREAD)) {
-              bool success = GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info);
-              bool matches = (info.ftLastWriteTime.dwLowDateTime == s->info.ftLastWriteTime.dwLowDateTime && 
-                info.ftLastWriteTime.dwHighDateTime == s->info.ftLastWriteTime.dwHighDateTime && 
-                info.nFileIndexHigh == s->info.nFileIndexHigh && info.nFileIndexLow == s->info.nFileIndexLow &&
-                info.nFileSizeHigh == s->info.nFileSizeHigh && info.nFileSizeLow == s->info.nFileSizeLow && 
-                info.dwVolumeSerialNumber == s->info.dwVolumeSerialNumber);
-              if (matches && success) {
-                file_bin_hardlinks_result.push_back(file_path.string());
-                if (file_bin_hardlinks_result.size() >= info.nNumberOfLinks) {
-                  s->info.nNumberOfLinks = info.nNumberOfLinks; s->vec.clear();
-                  _close(fd);
-                  return;
+      if (s->i < s->x.size()) {
+        std::error_code ec; if (!directory_exists(s->x[s->i])) return;
+        s->x[s->i] = expand_without_trailing_slash(s->x[s->i]);
+        const ghc::filesystem::path path = ghc::filesystem::path(s->x[s->i]);
+        if (directory_exists(s->x[s->i]) || path.root_name().string() + "\\" == path.string()) {
+          ghc::filesystem::directory_iterator end_itr;
+          for (ghc::filesystem::directory_iterator dir_ite(path, ec); dir_ite != end_itr; dir_ite.increment(ec)) {
+            message_pump(); if (ec.value() != 0) { break; }
+            ghc::filesystem::path file_path = ghc::filesystem::path(filename_absolute(dir_ite->path().string()));
+            #if defined(_WIN32)
+            int fd = -1;
+            BY_HANDLE_FILE_INFORMATION info = { 0 };
+            if (file_exists(file_path.string())) {
+              // printf("%s\n", file_path.string().c_str());
+              if (!_wsopen_s(&fd, file_path.wstring().c_str(), _O_RDONLY, _SH_DENYNO, _S_IREAD)) {
+                bool success = GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info);
+                bool matches = (info.ftLastWriteTime.dwLowDateTime == s->info.ftLastWriteTime.dwLowDateTime && 
+                  info.ftLastWriteTime.dwHighDateTime == s->info.ftLastWriteTime.dwHighDateTime && 
+                  info.nFileSizeHigh == s->info.nFileSizeHigh && info.nFileSizeLow == s->info.nFileSizeLow &&
+                  info.nFileSizeHigh == s->info.nFileSizeHigh && info.nFileSizeLow == s->info.nFileSizeLow && 
+                  info.dwVolumeSerialNumber == s->info.dwVolumeSerialNumber);
+                if (matches && success) {
+                  file_bin_hardlinks_result.push_back(file_path.string());
+                  if (file_bin_hardlinks_result.size() >= info.nNumberOfLinks) {
+                   s->info.nNumberOfLinks = info.nNumberOfLinks; s->x.clear();
+                    _close(fd);
+                    return;
+                  }
                 }
-              }
-              _close(fd);
-            }
-          }
-          #else
-          struct stat info = { 0 }; 
-          if (file_exists(file_path.string())) {
-            // printf("%s\n", file_path.string().c_str());
-            if (!stat(file_path.string().c_str(), &info)) {
-              if (info.st_dev == s->info.st_dev && info.st_ino == s->info.st_ino && 
-                info.st_size == s->info.st_size && info.st_mtime == s->info.st_mtime) {
-                file_bin_hardlinks_result.push_back(file_path.string());
-                if (file_bin_hardlinks_result.size() >= info.st_nlink) {
-                  s->info.st_nlink = info.st_nlink; s->vec.clear();
-                  return;
-                }
+                 _close(fd);
               }
             }
-          }
-          #endif
-          if (s->recursive && directory_exists(file_path.string())) {
-            // printf("%s\n", file_path.string().c_str());
-            s->vec.push_back(file_path.string());
-            s->index++; file_bin_hardlinks_helper(s);
+            #else
+            struct stat info = { 0 }; 
+            if (file_exists(file_path.string())) {
+              // printf("%s\n", file_path.string().c_str());
+              if (!stat(file_path.string().c_str(), &info)) {
+                if (info.st_dev == s->info.st_dev && info.st_ino == s->info.st_ino && 
+                  info.st_size == s->info.st_size && info.st_mtime == s->info.st_mtime) {
+                 file_bin_hardlinks_result.push_back(file_path.string());
+                  if (file_bin_hardlinks_result.size() >= info.st_nlink) {
+                  s->info.st_nlink = info.st_nlink; s->x.clear();
+                    return;
+                  }
+                }
+              }
+            }
+            #endif
+            if (s->recursive && directory_exists(file_path.string())) {
+              // printf("%s\n", file_path.string().c_str());
+              s->x.push_back(file_path.string());
+              s->i++; file_bin_hardlinks_helper(s);
+            }
           }
         }
       }
-      #if defined(_WIN32)
-      while (file_bin_hardlinks_result.size() < s->info.nNumberOfLinks) {
-      #else
-      while (file_bin_hardlinks_result.size() < s->info.st_nlink) {
-      #endif
-        message_pump(); s->index++;
-        file_bin_hardlinks_helper(s);
+      while (s->j < s->y.size() && directory_exists(s->y[s->j])) {
+        message_pump(); s->x.clear(); s->x.push_back(s->y[s->j]);
+        s->j++; file_bin_hardlinks_helper(s);
       }
     }
 
@@ -513,8 +511,8 @@ namespace ngs::fs {
     return 0;
   }
 
-  string file_bin_hardlinks(int fd, string dnames, bool recursive) {
-    string paths;
+vector<string> file_bin_hardlinks(int fd, vector<string> dnames, bool recursive) {
+    vector<string> paths;
     #if defined(_WIN32)
     BY_HANDLE_FILE_INFORMATION info = { 0 };
     if (GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info) && info.nNumberOfLinks) {
@@ -524,18 +522,17 @@ namespace ngs::fs {
     #endif
       file_bin_hardlinks_result.clear();
       struct file_bin_hardlinks_struct s; 
-      vector<string> in = string_split(dnames, '\n');
-      s.vec             = in;
-      s.index           = 0;
+      vector<string> first;
+      first.push_back(dnames[0]);
+      dnames.erase(dnames.begin());
+      s.x               = first;
+      s.y               = dnames;
+      s.i               = 0;
+      s.j               = 0;
       s.recursive       = recursive;
       s.info            = info;
       file_bin_hardlinks_helper(&s);
-      for (unsigned i = 0; i < file_bin_hardlinks_result.size(); i++) {
-        message_pump(); paths += file_bin_hardlinks_result[i] + "\n";
-      }
-      if (!paths.empty()) {
-        paths.pop_back();
-      }
+      paths = file_bin_hardlinks_result;
     }
     return paths;
   }

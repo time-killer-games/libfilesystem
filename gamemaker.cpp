@@ -45,6 +45,42 @@ char *directory_get_temporary_path() {
   return (char *)result.c_str();
 }
 
+char *directory_get_desktop_path() {
+  static string result;
+  result = ngs::fs::directory_get_desktop_path();
+  return (char *)result.c_str();
+}
+
+char *directory_get_documents_path() {
+  static string result;
+  result = ngs::fs::directory_get_documents_path();
+  return (char *)result.c_str();
+}
+
+char *directory_get_downloads_path() {
+  static string result;
+  result = ngs::fs::directory_get_downloads_path();
+  return (char *)result.c_str();
+}
+
+char *directory_get_music_path() {
+  static string result;
+  result = ngs::fs::directory_get_music_path();
+  return (char *)result.c_str();
+}
+
+char *directory_get_pictures_path() {
+  static string result;
+  result = ngs::fs::directory_get_pictures_path();
+  return (char *)result.c_str();
+}
+
+char *directory_get_videos_path() {
+  static string result;
+  result = ngs::fs::directory_get_videos_path();
+  return (char *)result.c_str();
+}
+
 char *executable_get_directory() {
   static string result;
   result = ngs::fs::executable_get_directory();

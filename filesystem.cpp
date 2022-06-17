@@ -47,10 +47,12 @@
 #include <sys/stat.h>
 #if defined(_WIN32) 
 #include <windows.h>
+#include <Shlobj.h>
 #include <share.h>
 #include <io.h>
 #else
 #if defined(__APPLE__) && defined(__MACH__)
+#include <sysdir.h>
 #include <libproc.h>
 #elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/sysctl.h>

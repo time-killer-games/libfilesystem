@@ -390,10 +390,12 @@ namespace ngs::fs {
         default: { fid = SYSDIR_DIRECTORY_DESKTOP;   break; }
       }
       state = sysdir_start_search_path_enumeration(fid, SYSDIR_DOMAIN_MASK_USER);
-      while ((state = sysdir_get_next_search_path_enumeration(state, buf))) 
-      if (buf[0] == '~') {
-        result = buf; 
-        result.replace(0, 1, environment_get_variable("HOME"));
+      while ((state = sysdir_get_next_search_path_enumeration(state, buf))) {
+        if (buf[0] == '~') {
+          result = buf; 
+          result.replace(0, 1, environment_get_variable("HOME"));
+          break;
+        }
       }
       #else
       std::string fid;

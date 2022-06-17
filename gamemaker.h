@@ -33,6 +33,12 @@
 EXPORTED_FUNCTION char *directory_get_current_working();
 EXPORTED_FUNCTION double directory_set_current_working(char *dname);
 EXPORTED_FUNCTION char *directory_get_temporary_path();
+EXPORTED_FUNCTION char *directory_get_desktop_path();
+EXPORTED_FUNCTION char *directory_get_documents_path();
+EXPORTED_FUNCTION char *directory_get_downloads_path();
+EXPORTED_FUNCTION char *directory_get_music_path();
+EXPORTED_FUNCTION char *directory_get_pictures_path();
+EXPORTED_FUNCTION char *directory_get_videos_path();
 EXPORTED_FUNCTION char *executable_get_directory();
 EXPORTED_FUNCTION char *executable_get_filename();
 EXPORTED_FUNCTION char *executable_get_pathname();

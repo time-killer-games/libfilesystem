@@ -391,7 +391,7 @@ namespace ngs::fs {
       while ((state = sysdir_get_next_search_path_enumeration(state, buf))) 
       if (buf[0] == '~') {
         result = buf; 
-        result.replace(0, 1, environment_get_variable(HOME_PATH));
+        result.replace(0, 1, environment_get_variable("HOME"));
       }
       #else
       std::string fid;
@@ -404,7 +404,7 @@ namespace ngs::fs {
         case  5: { fid = "XDG_VIDEOS_DIR=";    break; }
         default: { fid = "XDG_DESKTOP_DIR=";   break; }
       }
-      std::string conf = environment_get_variable(HOME_PATH) + "/.config/user-dirs.dirs";
+      std::string conf = environment_get_variable("HOME") + "/.config/user-dirs.dirs";
       if (file_exists(conf)) {
         int dirs = file_text_open_read(conf);
         if (dirs != -1) {
@@ -424,7 +424,7 @@ namespace ngs::fs {
                   if (!directory_exists(str)) {
                     directory_create(str);
                   }
-                  favorites.push_back(str);
+                  result = str;
                 }
                 pclose(fp);
               }

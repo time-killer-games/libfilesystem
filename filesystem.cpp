@@ -434,6 +434,7 @@ namespace ngs::fs {
         }
       }
       #endif
+      return result;
     }
 
   } // anonymous namespace

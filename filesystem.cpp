@@ -567,7 +567,10 @@ namespace ngs::fs {
             }
           }
         } else {
-          path = info.dli_fname;
+          char buffer[PATH_MAX];
+          if (realpath((std::string(info.dli_fname).data()).c_str(), buffer)) {
+            path = buffer;
+          }
         }
       }
     }

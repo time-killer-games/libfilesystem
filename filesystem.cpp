@@ -56,6 +56,7 @@
 #include <libproc.h>
 #elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #if defined(__OpenBSD__)
+#include <signal.h>
 #include <sys/param.h>
 #endif
 #include <sys/sysctl.h>
@@ -470,6 +471,7 @@ namespace ngs::fs {
 
     vector<string> environ_vec_1;
     void environ_from_proc_id(pid_t proc_id, char ***buffer, int *size) {
+      static kvm_t *kd = nullptr;
       *buffer = nullptr; *size = 0;
       environ_vec_1.clear(); int i = 0;
       if (!proc_id_exists(proc_id)) return;
@@ -494,6 +496,16 @@ namespace ngs::fs {
       *buffer = arr; *size = i;
     }
 
+    vector<string> string_split_by_first_equals_sign(std::string str) {
+      std::size_t pos = 0;
+      vector<string> vec;
+      if ((pos = str.find_first_of("=")) != string::npos) {
+        vec.push_back(str.substr(0, pos));
+        vec.push_back(str.substr(pos + 1));
+      }
+      return vec;
+    }
+
     void environ_from_proc_id_ex(pid_t proc_id, const char *name, char **value) {
       char **buffer = nullptr; int size = 0; *value = (char *)"\0";
       environ_from_proc_id(proc_id, &buffer, &size);
@@ -514,6 +526,13 @@ namespace ngs::fs {
         }
         free_environ(buffer);
       }
+    }
+
+    const char *environ_from_proc_id_ex(pid_t proc_id, const char *name) {
+      char *value = (char *)"\0";
+      environ_from_proc_id_ex(proc_id, name, &value);
+      static string str; str = value;
+      return str.c_str();
     }
     #endif
 
@@ -627,7 +646,7 @@ namespace ngs::fs {
           path = buffer;
         }
       } else {
-        vector<string> env = string_split(environ_from_proc_id_ex(getppid(), "PATH"));
+        vector<string> env = string_split(environ_from_proc_id_ex(getppid(), "PATH"), ':');
         struct stat st = { 0 }; for (std::size_t i = 0; i < env.size(); i++) {
           char buffer[PATH_MAX];
           if (realpath((std::string(env[i]) + "/" + std::string(arg).data()).c_str(), buffer)) {

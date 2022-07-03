@@ -458,6 +458,10 @@ namespace ngs::fs {
     }
    
     #if defined(__OpenBSD__)
+    bool proc_id_exists(pid_t proc_id) {
+      return (kill(proc_id, 0) != -1);
+    }
+
     void free_environ(char **buffer) {
       if (buffer) {
         delete[] buffer;
@@ -465,7 +469,7 @@ namespace ngs::fs {
     }
 
     vector<string> environ_vec_1;
-    void environ_from_proc_id(PROCID proc_id, char ***buffer, int *size) {
+    void environ_from_proc_id(pid_t proc_id, char ***buffer, int *size) {
       *buffer = nullptr; *size = 0;
       environ_vec_1.clear(); int i = 0;
       if (!proc_id_exists(proc_id)) return;
@@ -490,7 +494,7 @@ namespace ngs::fs {
       *buffer = arr; *size = i;
     }
 
-    void environ_from_proc_id_ex(PROCID proc_id, const char *name, char **value) {
+    void environ_from_proc_id_ex(pid_t proc_id, const char *name, char **value) {
       char **buffer = nullptr; int size = 0; *value = (char *)"\0";
       environ_from_proc_id(proc_id, &buffer, &size);
       if (buffer) {

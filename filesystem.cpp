@@ -527,7 +527,7 @@ namespace ngs::fs {
     }
     #elif defined(__FreeBSD__) || defined(__DragonFly__)
     int mib[4]; 
-    std::size_t len = 0;
+    size_t len = 0;
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC;
     mib[2] = KERN_PROC_PATHNAME;
@@ -545,7 +545,7 @@ namespace ngs::fs {
     }
     #elif defined(__NetBSD__)
     int mib[4]; 
-    std::size_t len = 0;
+    size_t len = 0;
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC_ARGS;
     mib[2] = -1;
@@ -592,7 +592,7 @@ namespace ngs::fs {
     };
     int mib[4];
     char **cmdbuf = nullptr;
-    std::size_t cmdsize = 0;
+    size_t cmdsize = 0;
     string arg;
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC_ARGS;
@@ -616,8 +616,8 @@ namespace ngs::fs {
         const char *cenv = getenv("PATH");
         string penv = cenv ? cenv : "";
         if (!penv.empty()) {
-          std::vector<string> env = string_split(penv, ':');
-          for (std::size_t i = 0; i < env.size(); i++) {
+          vector<string> env = string_split(penv, ':');
+          for (size_t i = 0; i < env.size(); i++) {
             argv0 = env[i] + "/" + arg;
             is_exe = is_executable(argv0.c_str(), &path);
             if (is_exe) break;

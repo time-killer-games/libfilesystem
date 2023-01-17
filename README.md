@@ -1,6 +1,3 @@
-# libfilesystem
-CoreNGS FileSystem Library For GameMaker
-
 ![libfilesystem-01.png](https://github.com/time-killer-games/libfilsystem/blob/master/libfilesystem-01.png?raw=true)
 
 ![libfilesystem-02.png](https://github.com/time-killer-games/libfilsystem/blob/master/libfilesystem-02.png?raw=true)

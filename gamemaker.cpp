@@ -24,8 +24,8 @@
  
 */
 
-#include "gamemaker.h"
-#include "filesystem.h"
+#include "gamemaker.hpp"
+#include "filesystem.hpp"
 
 using std::string;
 
